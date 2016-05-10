@@ -8,7 +8,10 @@ function worx_commerce_term_pricing_settings_form() {
   foreach ($temp_thing as $sku) {
     $product = commerce_product_load_by_sku($sku);
     dsm($product);
-    dsm($order);
+  }
+  foreach ($order->commerce_line_items[LANGUAGE_NONE] as $index => $array) {
+    $line_item = commerce_line_item_load($array['line_item_id']);
+    dsm($line_item);
   }
 
 
