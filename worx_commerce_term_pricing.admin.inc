@@ -13,6 +13,14 @@ function worx_commerce_term_pricing_settings_form() {
     $line_item = commerce_line_item_load($array['line_item_id']);
     dsm($line_item);
   }
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'commerce_product')
+    ->entityCondition('bundle', 'product')
+    ->propertyCondition('status', 1)
+    ->fieldOrderBy('commerce_price', 'amount', 'ASC')
+  ;
+  $result = $query->execute();
+  dsm($result);
 
 
   $form['contact_information'] = array(
