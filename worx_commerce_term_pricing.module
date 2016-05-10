@@ -1,0 +1,38 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function worx_commerce_term_pricing_menu() {
+  $items = array();
+
+  $items['admin/commerce/term_pricing'] = array(
+    'title' => 'Term Pricing Settings',
+    'description' => 'Review and add new term pricing',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('worx_commerce_term_pricing_settings_form'),
+    'access arguments' => array('worx_commerce_term_pricing_admin'),
+    'file' => 'worx_commerce_term_pricing.admin.inc',
+    'file path' => drupal_get_path('module', 'worx_commerce_term_pricing'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['admin/commerce/term_pricing/view'] = array(
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function worx_commerce_term_pricing_permission() {
+  $return = array();
+
+  $return['worx_commerce_term_pricing_admin'] = array(
+    'title' => t('Administer Term Pricing'),
+    'description' => t('Allows the user to apply price changing term rules'),
+  );
+
+  return $return;
+}
