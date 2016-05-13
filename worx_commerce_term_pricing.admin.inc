@@ -3,6 +3,16 @@
 function worx_commerce_term_pricing_settings_form() {
   $temp_thing = array('BULK01');
 
+  $flavor = taxonomy_vocabulary_machine_name_load('product_flavor');
+  $fl_terms = entity_load('taxonomy_term', FALSE, array('vid' => $flavor->vid));
+  $strength = taxonomy_vocabulary_machine_name_load('product_strength');
+  $st_terms = entity_load('taxonomy_term', FALSE, array('vid' => $strength->vid));
+  $pgvg = taxonomy_vocabulary_machine_name_load('product_pg_vg');
+  $pgvg_terms = entity_load('taxonomy_term', FALSE, array('vid' => $pgvg->vid));
+  dsm($fl_terms);
+  dsm($st_terms);
+  dsm($pgvg_terms);
+
   global $user;
   $order = commerce_cart_order_load($user->uid);
   foreach ($temp_thing as $sku) {
