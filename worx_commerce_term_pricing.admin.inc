@@ -32,47 +32,63 @@ function worx_commerce_term_pricing_settings_form() {
   }
 
 
+  $form['pricing_rule'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Add New Pricing Rule'),
+    '#prefix' => '<table><tr>',
+    '#suffix' => '</tr></table>',
+  );
   $form['contact_information'] = array(
     '#markup' => t("More information to come"),
   );
-  $form['products'] = array(
+  $form['pricing_rule']['products'] = array(
     '#type' => 'select',
     '#title' => t('Products'),
     '#options' => $bulk_products,
     '#empty_option' => t('-Select Product-'),
     '#required' => TRUE,
     '#default_value' => '',
+    '#prefix' => '<td>',
+    '#suffix' => '</td>',
    );
-  $form['flavor'] = array(
+  $form['pricing_rule']['flavor'] = array(
     '#type' => 'select',
     '#title' => t('Flavor'),
     '#options' => $flavor_options,
     '#empty_option' => t('-None-'),
     '#default_value' => '',
+    '#prefix' => '<td>',
+    '#suffix' => '</td>',
    );
-  $form['strength'] = array(
+  $form['pricing_rule']['strength'] = array(
     '#type' => 'select',
     '#title' => t('Strength'),
     '#options' => $strength_options,
     '#empty_option' => t('-None-'),
     '#default_value' => '',
+    '#prefix' => '<td>',
+    '#suffix' => '</td>',
    );
-  $form['pgvg'] = array(
+  $form['pricing_rule']['pgvg'] = array(
     '#type' => 'select',
     '#title' => t('PG/VG Ratio'),
     '#options' => $pgvg_options,
     '#empty_option' => t('-None-'),
     '#default_value' => '',
+    '#prefix' => '<td>',
+    '#suffix' => '</td>',
    );
-  $form['change'] = array(
+  $form['pricing_rule']['change'] = array(
     '#type' => 'textfield',
     '#title' => t('Price Change'),
     '#default_value' => '',
     '#size' => 25,
     '#maxlength' => 100,
     '#required' => TRUE,
+    '#prefix' => '<td>',
+    '#suffix' => '</td>',
   );
-  $form['change_type'] = array(
+  $form['pricing_rule']['change_type'] = array(
     '#type' => 'select',
     '#title' => t('Price Change Type'),
     '#options' => array(
@@ -80,6 +96,8 @@ function worx_commerce_term_pricing_settings_form() {
       'percent' => 'Percent Change',
     ),
     '#default_value' => array('flat'),
+    '#prefix' => '<td>',
+    '#suffix' => '</td>',
   );
 
   return $form;
