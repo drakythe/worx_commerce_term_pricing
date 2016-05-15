@@ -69,7 +69,7 @@ function worx_commerce_term_pricing_settings_form() {
     '#title' => t('Price Change'),
     '#default_value' => '',
     '#size' => 25,
-    'maxlength' => 100,
+    '#maxlength' => 100,
     '#required' => TRUE,
   );
   $form['change_type'] = array(
@@ -79,8 +79,7 @@ function worx_commerce_term_pricing_settings_form() {
       'flat' => 'Flat Increase/decrease',
       'percent' => 'Percent Change',
     ),
-    '#empty_option' => t('-None-'),
-    '#default_value' => '',
+    '#default_value' => array('flat'),
   );
 
   return $form;
