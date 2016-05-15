@@ -7,15 +7,17 @@ function worx_commerce_term_pricing_settings_form() {
   $st_terms = entity_load('taxonomy_term', FALSE, array('vid' => $strength->vid));
   $pgvg = taxonomy_vocabulary_machine_name_load('product_pg_vg');
   $pgvg_terms = entity_load('taxonomy_term', FALSE, array('vid' => $pgvg->vid));
-  //dsm($fl_terms);
-  //dsm($st_terms);
-  //dsm($pgvg_terms);
-  $flavor_options = $strength_options = $pgvg_options = array();
+  $flavor_options = $strength_options = $pgvg_options = $bulk_products = array();
 
   foreach ($fl_terms as $flt_obj) {
-    $flavor_options[$fl_terms[$flt_obj->tid]] = $fl_terms[$flt_obj->name];
+    $flavor_options[$flt_obj->tid] = $flt_obj->name;
   }
-  dsm($flavor_options);
+  foreach ($st_terms as $str_obj) {
+    $strength_options[$str_obj->tid] = $str_obj->name;
+  }
+  foreach ($pgvg_terms as $pgvg_obj) {
+    $pgvg_options[$pgvg_obj->tid] = $pgvg_obj->name;
+  }
 
   $query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'commerce_product')
@@ -24,12 +26,44 @@ function worx_commerce_term_pricing_settings_form() {
     ->fieldOrderBy('commerce_price', 'amount', 'ASC')
   ;
   $result = $query->execute();
-  dsm($result);
+  foreach ($result['commerce_product'] as $product_obj) {
+    $product = commerce_product_load($product_obj->product_id);
+    $bulk_products[$product->sku] = $product->title;
+  }
 
 
   $form['contact_information'] = array(
-    '#markup' => t('You can leave us a message using the contact form below.'),
+    '#markup' => t("More information to come"),
   );
+  $form['products'] = array(
+       '#type' => 'select',
+       '#title' => t('Products'),
+       '#options' => $bulk_products,
+       '#empty_option' => t('-Select Product-'),
+       '#required' => TRUE,
+       '#default_value' => '',
+   );
+  $form['flavor'] = array(
+       '#type' => 'select',
+       '#title' => t('Flavor'),
+       '#options' => $flavor_options,
+       '#empty_option' => t('-None-'),
+       '#default_value' => '',
+   );
+  $form['strength'] = array(
+       '#type' => 'select',
+       '#title' => t('Strength'),
+       '#options' => $strength_options,
+       '#empty_option' => t('-None-'),
+       '#default_value' => '',
+   );
+  $form['pgvg'] = array(
+       '#type' => 'select',
+       '#title' => t('PG/VG Ratio'),
+       '#options' => $pgvg_options,
+       '#empty_option' => t('-None-'),
+       '#default_value' => '',
+   );
 
   return $form;
 }
