@@ -36,34 +36,52 @@ function worx_commerce_term_pricing_settings_form() {
     '#markup' => t("More information to come"),
   );
   $form['products'] = array(
-       '#type' => 'select',
-       '#title' => t('Products'),
-       '#options' => $bulk_products,
-       '#empty_option' => t('-Select Product-'),
-       '#required' => TRUE,
-       '#default_value' => '',
+    '#type' => 'select',
+    '#title' => t('Products'),
+    '#options' => $bulk_products,
+    '#empty_option' => t('-Select Product-'),
+    '#required' => TRUE,
+    '#default_value' => '',
    );
   $form['flavor'] = array(
-       '#type' => 'select',
-       '#title' => t('Flavor'),
-       '#options' => $flavor_options,
-       '#empty_option' => t('-None-'),
-       '#default_value' => '',
+    '#type' => 'select',
+    '#title' => t('Flavor'),
+    '#options' => $flavor_options,
+    '#empty_option' => t('-None-'),
+    '#default_value' => '',
    );
   $form['strength'] = array(
-       '#type' => 'select',
-       '#title' => t('Strength'),
-       '#options' => $strength_options,
-       '#empty_option' => t('-None-'),
-       '#default_value' => '',
+    '#type' => 'select',
+    '#title' => t('Strength'),
+    '#options' => $strength_options,
+    '#empty_option' => t('-None-'),
+    '#default_value' => '',
    );
   $form['pgvg'] = array(
-       '#type' => 'select',
-       '#title' => t('PG/VG Ratio'),
-       '#options' => $pgvg_options,
-       '#empty_option' => t('-None-'),
-       '#default_value' => '',
+    '#type' => 'select',
+    '#title' => t('PG/VG Ratio'),
+    '#options' => $pgvg_options,
+    '#empty_option' => t('-None-'),
+    '#default_value' => '',
    );
+  $form['change'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Price Change'),
+    '#default_value' => '',
+    '#size' => 25,
+    'maxlength' => 100,
+    '#required' => TRUE,
+  );
+  $form['change_type'] = array(
+    '#type' => 'select',
+    '#title' => t('Price Change Type'),
+    '#options' => array(
+      'flat' => 'Flat Increase/decrease',
+      'percent' => 'Percent Change'
+    ),
+    '#empty_option' => t('-None-'),
+    '#default_value' => '',
+  );
 
   return $form;
 }
