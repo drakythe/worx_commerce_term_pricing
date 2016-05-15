@@ -77,7 +77,7 @@ function worx_commerce_term_pricing_settings_form() {
     '#title' => t('Price Change Type'),
     '#options' => array(
       'flat' => 'Flat Increase/decrease',
-      'percent' => 'Percent Change'
+      'percent' => 'Percent Change',
     ),
     '#empty_option' => t('-None-'),
     '#default_value' => '',
