@@ -32,26 +32,22 @@ function worx_commerce_term_pricing_settings_form() {
   }
 
 
-  $form['pricing_rule'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Add New Pricing Rule'),
-    '#prefix' => '<table><tr>',
-    '#suffix' => '</tr></table>',
-  );
   $form['contact_information'] = array(
-    '#markup' => t("More information to come"),
+    '#markup' => t("Add New Pricing Rule"),
+    '#prefix' => '<strong>',
+    '#suffix' => '</strong>',
   );
-  $form['pricing_rule']['products'] = array(
+  $form['products'] = array(
     '#type' => 'select',
     '#title' => t('Products'),
     '#options' => $bulk_products,
     '#empty_option' => t('-Select Product-'),
     '#required' => TRUE,
     '#default_value' => '',
-    '#prefix' => '<td>',
+    '#prefix' => '<table><tr><td>',
     '#suffix' => '</td>',
    );
-  $form['pricing_rule']['flavor'] = array(
+  $form['flavor'] = array(
     '#type' => 'select',
     '#title' => t('Flavor'),
     '#options' => $flavor_options,
@@ -60,7 +56,7 @@ function worx_commerce_term_pricing_settings_form() {
     '#prefix' => '<td>',
     '#suffix' => '</td>',
    );
-  $form['pricing_rule']['strength'] = array(
+  $form['strength'] = array(
     '#type' => 'select',
     '#title' => t('Strength'),
     '#options' => $strength_options,
@@ -69,7 +65,7 @@ function worx_commerce_term_pricing_settings_form() {
     '#prefix' => '<td>',
     '#suffix' => '</td>',
    );
-  $form['pricing_rule']['pgvg'] = array(
+  $form['pgvg'] = array(
     '#type' => 'select',
     '#title' => t('PG/VG Ratio'),
     '#options' => $pgvg_options,
@@ -78,7 +74,7 @@ function worx_commerce_term_pricing_settings_form() {
     '#prefix' => '<td>',
     '#suffix' => '</td>',
    );
-  $form['pricing_rule']['change'] = array(
+  $form['change'] = array(
     '#type' => 'textfield',
     '#title' => t('Price Change'),
     '#default_value' => '',
@@ -88,7 +84,7 @@ function worx_commerce_term_pricing_settings_form() {
     '#prefix' => '<td>',
     '#suffix' => '</td>',
   );
-  $form['pricing_rule']['change_type'] = array(
+  $form['change_type'] = array(
     '#type' => 'select',
     '#title' => t('Price Change Type'),
     '#options' => array(
@@ -97,8 +93,18 @@ function worx_commerce_term_pricing_settings_form() {
     ),
     '#default_value' => array('flat'),
     '#prefix' => '<td>',
-    '#suffix' => '</td>',
+    '#suffix' => '</td></tr></table>',
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save')
   );
 
   return $form;
+}
+
+function worx_commerce_term_pricing_settings_form_submit($form, &$form_state) {
+  dsm($form_state['values']);
+
 }
