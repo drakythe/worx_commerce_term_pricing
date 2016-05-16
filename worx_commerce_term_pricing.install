@@ -56,6 +56,8 @@ function worx_commerce_term_pricing_schema() {
         'default' => '',
       ),
     ),
+
+    'primary key' => array('tprid'),
   );
 
   return $schema;
