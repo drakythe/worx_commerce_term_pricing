@@ -1,0 +1,62 @@
+<?php
+
+
+function worx_commerce_term_pricing_schema() {
+  $schema = array();
+
+  $schema['commerce_term_pricing_rules'] = array(
+    'description' => 'Holds the term pricing rules',
+    'fields' => array(
+      'tprid' => array(
+        'description' => 'Term Price Rule ID',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'product_sku' => array(
+        'description' => 'The SKU of the product this rule applies to',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'flavor_tid' => array(
+        'description' => 'Term ID of the flavor this rule applies to',
+        'type' => 'int',
+        'size' => 'normal',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'strength_tid' => array(
+        'description' => 'Term ID of the strength this rule applies to',
+        'type' => 'int',
+        'size' => 'normal',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'pgvg_tid' => array(
+        'description' => 'Term ID of the pg/vg ratio this rule applies to',
+        'type' => 'int',
+        'size' => 'normal',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'price_change' => array(
+        'description' => 'The amount the price changes by',
+        'type' => 'int',
+        'size' => 'big',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'change_type' => array(
+        'description' => 'Whether the price change is a flat change or percentage based.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+    ),
+  );
+
+  return $schema;
+}
