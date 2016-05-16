@@ -37,9 +37,9 @@ function worx_commerce_term_pricing_settings_form() {
     '#prefix' => '<strong>',
     '#suffix' => '</strong>',
   );
-  $form['products'] = array(
+  $form['product'] = array(
     '#type' => 'select',
-    '#title' => t('Products'),
+    '#title' => t('Product'),
     '#options' => $bulk_products,
     '#empty_option' => t('-Select Product-'),
     '#required' => TRUE,
@@ -106,5 +106,21 @@ function worx_commerce_term_pricing_settings_form() {
 
 function worx_commerce_term_pricing_settings_form_submit($form, &$form_state) {
   dsm($form_state['values']);
+
+  $values = $form_state['values'];
+  $record = array();
+
+  $record['product_sku'] = $values['product'];
+  $record['flavor_tid'] = $values['flavor'];
+  $record['strength_tid'] = $values['strength'];
+  $record['pgvg_tid'] = $values['pgvg'];
+  $record['price_change'] = $values['change'];
+  $record['change_type'] = $values['change_type'];
+
+  $write = drupal_write_record('commerce_term_pricing_rules', $record);
+
+  if ($write === FALSE) {
+    drupal_set_message('Oops, something went wrong', 'error');
+  }
 
 }
