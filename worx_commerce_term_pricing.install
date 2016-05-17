@@ -43,7 +43,7 @@ function worx_commerce_term_pricing_schema() {
       ),
       'price_change' => array(
         'description' => 'The amount the price changes by',
-        'type' => 'int',
+        'type' => 'float',
         'size' => 'big',
         'not null' => TRUE,
         'default' => 0,

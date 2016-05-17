@@ -41,8 +41,8 @@ function worx_commerce_term_pricing_settings_form() {
     '#type' => 'select',
     '#title' => t('Product'),
     '#options' => $bulk_products,
-    '#empty_option' => t('-Select Product-'),
-    '#required' => TRUE,
+    '#empty_option' => t('-none-'),
+    '#required' => FALSE,
     '#default_value' => '',
     '#prefix' => '<table><tr><td>',
     '#suffix' => '</td>',
@@ -96,6 +96,8 @@ function worx_commerce_term_pricing_settings_form() {
     '#suffix' => '</td></tr></table>',
   );
 
+  $form['validate'][] = 'worx_commerce_term_pricing_rule_validate';
+
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save')
@@ -104,9 +106,33 @@ function worx_commerce_term_pricing_settings_form() {
   return $form;
 }
 
-function worx_commerce_term_pricing_settings_form_submit($form, &$form_state) {
-  dsm($form_state['values']);
+function worx_commerce_term_pricing_rule_validate($form, &$form_state) {
+  $values = $form_state['values'];
 
+  if (!is_int($values['change'] * 100)) {
+    if (!is_float($values['change'])) {
+      form_set_error('change', 'Please set a valid amount for price change');
+    }
+  }
+
+  $valid = FALSE;
+
+  if (!empty($values['flavor'])) {
+    $valid = TRUE;
+  }
+  else if (!empty($values['strength'])) {
+    $valid = TRUE;
+  }
+  else if (!empty($values['pgvg'])) {
+    $valid = TRUE;
+  }
+
+  if (!$valid) {
+    form_set_error('', 'Please select an attribute to apply this pricing rule to.');
+  }
+}
+
+function worx_commerce_term_pricing_settings_form_submit($form, &$form_state) {
   $values = $form_state['values'];
   $record = array();
 
@@ -114,7 +140,7 @@ function worx_commerce_term_pricing_settings_form_submit($form, &$form_state) {
   $record['flavor_tid'] = $values['flavor'];
   $record['strength_tid'] = $values['strength'];
   $record['pgvg_tid'] = $values['pgvg'];
-  $record['price_change'] = $values['change'];
+  $record['price_change'] = ($values['change'] * 100); // convert to minor units.
   $record['change_type'] = $values['change_type'];
 
   $write = drupal_write_record('commerce_term_pricing_rules', $record);
