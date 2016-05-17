@@ -48,15 +48,15 @@ function worx_commerce_term_pricing_rules_action_info() {
     'group' => t('Worx Commerce Term Pricing'),
     'parameter' => array(
       'product' => array(
-        'label' => t('Commerce Product'),
-        'type' => 'commerce_product',
-        'description' => t('The Commerce Product used to calculate price.')
+        'label' => t('Commerce Line Item'),
+        'type' => 'commerce_line_item',
+        'description' => t('The Commerce Line Item used to calculate price.')
       ),
     ),
     'provides' => array(
       'calculated_price' => array(
         'label' => t('Calculated Price'),
-        'type' => 'float',
+        'type' => 'int',
       ),
     ),
   );
