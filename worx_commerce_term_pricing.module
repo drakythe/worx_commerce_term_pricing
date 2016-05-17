@@ -36,3 +36,34 @@ function worx_commerce_term_pricing_permission() {
 
   return $return;
 }
+
+/**
+ * Implements hook_action_info().
+ */
+function worx_commerce_term_pricing_action_info() {
+  $rules = array();
+
+  $rules['worx_commerce_term_pricing_calculate_price'] = array(
+    'label' => t('Calculate A Term Price Product\'s Price'),
+    'group' => t('Worx Commerce Term Pricing'),
+    'parameter' => array(
+      'product' => array(
+        'label' => t('Commerce Product'),
+        'type' => 'commerce_product',
+        'description' => t('The Commerce Product used to calculate price.')
+      ),
+    ),
+    'provides' => array(
+      'calculated_price' => array(
+        'label' => t('Calculated Price'),
+        'type' => 'float',
+      ),
+    ),
+  );
+
+  return $rules;
+}
+
+function worx_commerce_term_pricing_calculate_price($commerce_product) {
+  watchdog('calc price product', '<pre>' . print_r($commerce_product, TRUE) . '</pre>');
+}
