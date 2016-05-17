@@ -140,13 +140,13 @@ function worx_commerce_term_pricing_settings_form_submit($form, &$form_state) {
   $record['flavor_tid'] = $values['flavor'];
   $record['strength_tid'] = $values['strength'];
   $record['pgvg_tid'] = $values['pgvg'];
-  $record['price_change'] = ($values['change'] * 100); // convert to minor units.
+  $record['price_change'] = $values['change'];
   $record['change_type'] = $values['change_type'];
 
   $write = drupal_write_record('commerce_term_pricing_rules', $record);
 
   if ($write === FALSE) {
-    drupal_set_message('Oops, something went wrong', 'error');
+    drupal_set_message('Rule failed to write to Database, inform site Administrator', 'error');
+    watchdog('Term Pricing', '<pre>' . print_r($record, TRUE) . '</pre>', array(), WATCHDOG_ERROR);
   }
-
 }
