@@ -96,7 +96,7 @@ function worx_commerce_term_pricing_settings_form() {
     '#suffix' => '</td></tr></table>',
   );
 
-  $form['validate'][] = 'worx_commerce_term_pricing_rule_validate';
+  $form['#validate'][] = 'worx_commerce_term_pricing_rule_validate';
 
   $form['submit'] = array(
     '#type' => 'submit',
@@ -109,10 +109,8 @@ function worx_commerce_term_pricing_settings_form() {
 function worx_commerce_term_pricing_rule_validate($form, &$form_state) {
   $values = $form_state['values'];
 
-  if (!is_int($values['change'] * 100)) {
-    if (!is_float($values['change'])) {
-      form_set_error('change', 'Please set a valid amount for price change');
-    }
+  if (!is_numeric($values['change'])) {
+    form_set_error('change', 'Please set a valid amount for price change');
   }
 
   $valid = FALSE;
