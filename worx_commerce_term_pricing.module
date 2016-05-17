@@ -40,7 +40,7 @@ function worx_commerce_term_pricing_permission() {
 /**
  * Implements hook_action_info().
  */
-function worx_commerce_term_pricing_action_info() {
+function worx_commerce_term_pricing_rules_action_info() {
   $rules = array();
 
   $rules['worx_commerce_term_pricing_calculate_price'] = array(
