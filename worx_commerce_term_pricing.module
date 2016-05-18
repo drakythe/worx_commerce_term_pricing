@@ -65,6 +65,7 @@ function worx_commerce_term_pricing_rules_action_info() {
 }
 
 function worx_commerce_term_pricing_calculate_price($line_item) {
-  $product = commerce_product_load_by_sku($line_item['line_item_label']);
-  watchdog('commerce price calc', '<pre>' . print_r($product, TRUE) . '</pre>');
+  $product = commerce_product_load_by_sku($line_item->line_item_label);
+  $base_price = $product['commerce_price'][LANGUAGE_NONE][0]['amount'];
+  return $base_price;
 }
