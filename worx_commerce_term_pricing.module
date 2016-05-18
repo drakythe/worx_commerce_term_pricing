@@ -72,6 +72,10 @@ function worx_commerce_term_pricing_rules_action_info() {
 function worx_commerce_term_pricing_calculate_price($line_item) {
   $product = commerce_product_load_by_sku($line_item->line_item_label);
   $base_price = $product->commerce_price[LANGUAGE_NONE][0]['amount'];
+  // If the product in question has not been added to a cart, bail out.
+  if (!isset($line_item->line_item_id)) {
+    return $base_price;
+  }
   $flavor = $line_item->field_bulk_flavor[LANGUAGE_NONE][0]['tid'];
   // @TODO: We won't be using these rules to begin with, but may enable them
   // later.
