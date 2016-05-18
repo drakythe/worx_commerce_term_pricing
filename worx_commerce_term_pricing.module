@@ -19,6 +19,14 @@ function worx_commerce_term_pricing_menu() {
   $items['admin/commerce/term_pricing/view'] = array(
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
+  $items['admin/commerce/term_pricing/%/delete'] = array(
+    'title' => 'Delete Term Pricing Rule',
+    'description' => 'Callback to delete a term pricing rule',
+    'page callback' => 'worx_commerce_term_pricing_delete_rule',
+    'page arguments' => array(3),
+    'access arguments' => array('worx_commerce_term_pricing_admin'),
+    'type' => MENU_CALLBACK,
+  );
 
   return $items;
 }
@@ -128,4 +136,10 @@ function worx_commerce_term_pricing_calculate_price($line_item) {
   return array(
     'calculated_price' => $calculated_price,
   );
+}
+
+function worx_commerce_term_pricing_delete_rule($rule_id) {
+  dsm($rule_id);
+
+  return("Hello, world!");
 }
