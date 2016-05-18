@@ -206,7 +206,7 @@ function worx_commerce_term_pricing_get_rules() {
       $flavor_name,
       $row->price_change,
       $row->change_type,
-      '<a href="/admin/commerce/term_pricing/' . $row->tprid . '/delete">Delete</a>',
+      '<a href="/admin/commerce/term_pricing/' . $row->tprid . '/delete?destination=/admin/commerce/term_pricing">Delete</a>',
     );
   }
 
