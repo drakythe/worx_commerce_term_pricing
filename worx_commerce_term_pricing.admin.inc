@@ -189,9 +189,20 @@ function worx_commerce_term_pricing_get_rules() {
 
   $rows = array();
   foreach ($results as $row) {
+    if (!empty($row->product_sku)) {
+      $product = commerce_product_load_by_sku($row->product_sku);
+      $title = $product->title;
+      $title = $title . '(' . $row->product_sku . ')';
+    }
+    else {
+      $title = 'N/A';
+    }
+    $flavor_term = taxonomy_term_load($row->flavor_tid);
+    $flavor_name = $flavor_term->name;
+
     $rows[] = array(
-      $row->product_sku,
-      $row->flavor_tid,
+      $title,
+      $flavor_name,
       $row->price_change,
       $row->change_type,
     );
