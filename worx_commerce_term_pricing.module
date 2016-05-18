@@ -139,7 +139,7 @@ function worx_commerce_term_pricing_calculate_price($line_item) {
 }
 
 function worx_commerce_term_pricing_delete_rule($rule_id) {
-  $deleted = db_delete('commerce_term_pricing_rule')
+  $deleted = db_delete('commerce_term_pricing_rules')
     ->condition('cprid', $rule_id)
     ->execute();
 
