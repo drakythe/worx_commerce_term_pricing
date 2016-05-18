@@ -36,7 +36,11 @@ function worx_commerce_term_pricing_settings_form() {
     $bulk_products[$product->sku] = $product->title;
   }
 
+  $rules_table = worx_commerce_term_pricing_get_rules();
 
+  $form['contact_information'] = array(
+    '#markup' => $rules_table,
+  );
   $form['contact_information'] = array(
     '#markup' => t("Add New Pricing Rule"),
     '#prefix' => '<strong>',
@@ -163,4 +167,38 @@ function worx_commerce_term_pricing_settings_form_submit($form, &$form_state) {
     drupal_set_message('Rule failed to write to Database, inform site Administrator', 'error');
     watchdog('Term Pricing', '<pre>' . print_r($record, TRUE) . '</pre>', array(), WATCHDOG_ERROR);
   }
+}
+
+function worx_commerce_term_pricing_get_rules() {
+  $header = array(
+    array('data' => 'Product', 'field' => 'product_sku', 'sort' => 'ASC'),
+    array('data' => 'Flavor', 'field' => 'flavor_tid', 'sort' => 'ASC'),
+    array('data' => 'Change', 'field' => 'price_change', 'sort' => 'ASC'),
+    array('data' => 'Change Type', 'field' => 'change_type'),
+  );
+
+  $select = db_select('commerce_term_pricing_rules', 'ctpr')
+    ->extend('PagerDefault')
+    ->extend('TableSort');
+
+  $select->fields('ctpr', array('product_sku', 'flavor_tid', 'price_change', 'change_type'))
+    ->limit(10)
+    ->orderByHeader($header);
+
+  $results = $select->execute();
+
+  $rows = array();
+  foreach ($results as $row) {
+    $rows[] = array(
+      $row->product_sku,
+      $row->flavor_tid,
+      $row->price_change,
+      $row->change_type,
+    );
+  }
+
+  $output = theme('table', array('header' => $header, 'rows' => $rows));
+  $output .= theme('pager');
+
+  return $output;
 }
