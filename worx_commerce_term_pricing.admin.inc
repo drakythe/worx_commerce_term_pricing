@@ -175,13 +175,14 @@ function worx_commerce_term_pricing_get_rules() {
     array('data' => 'Flavor', 'field' => 'flavor_tid', 'sort' => 'ASC'),
     array('data' => 'Change', 'field' => 'price_change', 'sort' => 'ASC'),
     array('data' => 'Change Type', 'field' => 'change_type'),
+    array('data' => 'Delete', 'field' => 'tprid'),
   );
 
   $select = db_select('commerce_term_pricing_rules', 'ctpr')
     ->extend('PagerDefault')
     ->extend('TableSort');
 
-  $select->fields('ctpr', array('product_sku', 'flavor_tid', 'price_change', 'change_type'))
+  $select->fields('ctpr', array('tprid', 'product_sku', 'flavor_tid', 'price_change', 'change_type'))
     ->limit(10)
     ->orderByHeader($header);
 
@@ -205,6 +206,7 @@ function worx_commerce_term_pricing_get_rules() {
       $flavor_name,
       $row->price_change,
       $row->change_type,
+      '<a href="/admin/commerce/term_pricing/' . $row->tprid . '/delete>Delete</a>',
     );
   }
 
