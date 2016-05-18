@@ -56,7 +56,7 @@ function worx_commerce_term_pricing_rules_action_info() {
     'provides' => array(
       'calculated_price' => array(
         'label' => t('Calculated Price'),
-        'type' => 'int',
+        'type' => 'decimal',
       ),
     ),
   );
