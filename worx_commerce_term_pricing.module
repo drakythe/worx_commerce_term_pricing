@@ -74,7 +74,9 @@ function worx_commerce_term_pricing_calculate_price($line_item) {
   $base_price = $product->commerce_price[LANGUAGE_NONE][0]['amount'];
   // If the product in question has not been added to a cart, bail out.
   if (!isset($line_item->line_item_id)) {
-    return $base_price;
+    return array(
+      'calculated_price' => $base_price,
+    );
   }
   $flavor = $line_item->field_bulk_flavor[LANGUAGE_NONE][0]['tid'];
   // @TODO: We won't be using these rules to begin with, but may enable them
@@ -102,7 +104,9 @@ function worx_commerce_term_pricing_calculate_price($line_item) {
   // Check one to see if we got a rule, if not just return the product's base
   // price.
   if (!is_array($query)) {
-    return $base_price;
+    return array(
+      'calculated_price' => $base_price,
+    );
   }
 
   // Assuming we found a rule which applies to this product, calculate the new
@@ -121,5 +125,7 @@ function worx_commerce_term_pricing_calculate_price($line_item) {
     $calculated_price = round($base_price + (($base_price/100) * $change));
   }
 
-  return $calculated_price;
+  return array(
+    'calculated_price' => $calculated_price,
+  );
 }
