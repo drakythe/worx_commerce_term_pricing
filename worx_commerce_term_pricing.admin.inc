@@ -38,7 +38,7 @@ function worx_commerce_term_pricing_settings_form() {
 
   $rules_table = worx_commerce_term_pricing_get_rules();
 
-  $form['contact_information'] = array(
+  $form['rules_table'] = array(
     '#markup' => $rules_table,
   );
   $form['contact_information'] = array(
