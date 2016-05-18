@@ -64,8 +64,58 @@ function worx_commerce_term_pricing_rules_action_info() {
   return $rules;
 }
 
+/**
+ * @param $line_item
+ *  Commerce Line Item Object
+ * @return float
+ */
 function worx_commerce_term_pricing_calculate_price($line_item) {
   $product = commerce_product_load_by_sku($line_item->line_item_label);
   $base_price = $product->commerce_price[LANGUAGE_NONE][0]['amount'];
-  return $base_price;
+  $flavor = $line_item->field_bulk_flavor[LANGUAGE_NONE][0]['tid'];
+  // @TODO: We won't be using these rules to begin with, but may enable them
+  // later.
+  //$pgvg = $line_item->field_bulk_pg_vg[LANGUAGE_NONE][0]['tid'];
+  //$strength = $line_item->field_bulk_strength[LANGUAGE_NONE][0]['tid'];
+
+  // First we see if a rule matches both the flavor & SKU
+  $query = db_select('commerce_term_pricing_rules', 'ctpr')
+    ->fields('ctpr')
+    ->condition('product_sku', $line_item->line_item_label)
+    ->condition('flavor_tid', $flavor)
+    ->execute()
+    ->fetchAssoc();
+
+  // If we have not found a rule which applies to both flavor and sku, check for
+  // one which applies just to the flavor.
+  if (!is_array($query)) {
+    $query = db_select('commerce_term_pricing_rules', 'ctpr')
+      ->fields('ctpr')
+      ->condition('flavor_tid', $flavor)
+      ->execute()
+      ->fetchAssoc();
+  }
+  // Check one to see if we got a rule, if not just return the product's base
+  // price.
+  if (!is_array($query)) {
+    return $base_price;
+  }
+
+  // Assuming we found a rule which applies to this product, calculate the new
+  // price and return it.
+  $change = $query['price_change'];
+  $type = $query['change_type'];
+
+  // If the change is a flat change, simple add the two values together
+  // after converting the change to minor units. Otherwise determine % value
+  // and multiply by the change value, rounding to account for decimal %s.
+  if ($type == 'flat') {
+    $change = (int) ($change * 100); // convert to minor units, discard any extra decimal places;
+    $calculated_price = $base_price + $change;
+  }
+  else {
+    $calculated_price = round($base_price + (($base_price/100) * $change));
+  }
+
+  return $calculated_price;
 }

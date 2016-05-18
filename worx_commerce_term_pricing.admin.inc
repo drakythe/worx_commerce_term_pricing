@@ -3,21 +3,26 @@
 function worx_commerce_term_pricing_settings_form() {
   $flavor = taxonomy_vocabulary_machine_name_load('product_flavor');
   $fl_terms = entity_load('taxonomy_term', FALSE, array('vid' => $flavor->vid));
+
+  foreach ($fl_terms as $flt_obj) {
+    $flavor_options[$flt_obj->tid] = $flt_obj->name;
+  }
+  // @TODO: We won't be using these rules to begin with, but may enable them
+  // later.
+  /**
   $strength = taxonomy_vocabulary_machine_name_load('product_strength');
   $st_terms = entity_load('taxonomy_term', FALSE, array('vid' => $strength->vid));
   $pgvg = taxonomy_vocabulary_machine_name_load('product_pg_vg');
   $pgvg_terms = entity_load('taxonomy_term', FALSE, array('vid' => $pgvg->vid));
   $flavor_options = $strength_options = $pgvg_options = $bulk_products = array();
 
-  foreach ($fl_terms as $flt_obj) {
-    $flavor_options[$flt_obj->tid] = $flt_obj->name;
-  }
   foreach ($st_terms as $str_obj) {
     $strength_options[$str_obj->tid] = $str_obj->name;
   }
   foreach ($pgvg_terms as $pgvg_obj) {
     $pgvg_options[$pgvg_obj->tid] = $pgvg_obj->name;
   }
+  */
 
   $query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'commerce_product')
@@ -56,6 +61,9 @@ function worx_commerce_term_pricing_settings_form() {
     '#prefix' => '<td>',
     '#suffix' => '</td>',
    );
+  // @TODO: We won't be using these rules to begin with, but may enable them
+  // later.
+  /**
   $form['strength'] = array(
     '#type' => 'select',
     '#title' => t('Strength'),
@@ -74,6 +82,7 @@ function worx_commerce_term_pricing_settings_form() {
     '#prefix' => '<td>',
     '#suffix' => '</td>',
    );
+   */
   $form['change'] = array(
     '#type' => 'textfield',
     '#title' => t('Price Change'),
@@ -118,12 +127,16 @@ function worx_commerce_term_pricing_rule_validate($form, &$form_state) {
   if (!empty($values['flavor'])) {
     $valid = TRUE;
   }
+  // @TODO: We won't be using these rules to begin with, but may enable them
+  // later.
+  /**
   else if (!empty($values['strength'])) {
     $valid = TRUE;
   }
   else if (!empty($values['pgvg'])) {
     $valid = TRUE;
   }
+   */
 
   if (!$valid) {
     form_set_error('', 'Please select an attribute to apply this pricing rule to.');
@@ -134,10 +147,13 @@ function worx_commerce_term_pricing_settings_form_submit($form, &$form_state) {
   $values = $form_state['values'];
   $record = array();
 
+  // @TODO: We won't be using these rules to begin with, but may enable them
+  // later.
+  //$record['strength_tid'] = $values['strength'];
+  //$record['pgvg_tid'] = $values['pgvg'];
+
   $record['product_sku'] = $values['product'];
   $record['flavor_tid'] = $values['flavor'];
-  $record['strength_tid'] = $values['strength'];
-  $record['pgvg_tid'] = $values['pgvg'];
   $record['price_change'] = $values['change'];
   $record['change_type'] = $values['change_type'];
 
