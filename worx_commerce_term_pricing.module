@@ -140,7 +140,7 @@ function worx_commerce_term_pricing_calculate_price($line_item) {
 
 function worx_commerce_term_pricing_delete_rule($rule_id) {
   $deleted = db_delete('commerce_term_pricing_rules')
-    ->condition('cprid', $rule_id)
+    ->condition('tprid', $rule_id)
     ->execute();
 
   drupal_set_message('Pricing Rule Deleted');
