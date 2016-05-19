@@ -215,3 +215,18 @@ function worx_commerce_term_pricing_get_rules() {
 
   return $output;
 }
+
+function worx_commerce_term_pricing_options_form() {
+  $form = array();
+  $nodes = node_load_multiple(array(), array('type' => 'bulk_product_display'));
+
+  $form['flavor'] = array(
+    '#type' => 'select',
+    '#title' => t('Flavor'),
+    '#options' => $nodes,
+    '#empty_option' => t('-None-'),
+    '#default_value' => '',
+  );
+
+  return $form;
+}

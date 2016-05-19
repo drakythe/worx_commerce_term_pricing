@@ -19,6 +19,16 @@ function worx_commerce_term_pricing_menu() {
   $items['admin/commerce/term_pricing/view'] = array(
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
+  $items['admin/commerce/term_pricing/options'] = array(
+    'title' => 'Settings for which options are available on which nodes',
+    'description' => 'Review and add Bulk Flavor Display Options',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('worx_commerce_term_pricing_options_form'),
+    'access arguments' => array('worx_commerce_term_pricing_admin'),
+    'file' => 'worx_commerce_term_pricing.admin.inc',
+    'file path' => drupal_get_path('module', 'worx_commerce_term_pricing'),
+    'type' => MENU_NORMAL_ITEM,
+  );
   $items['admin/commerce/term_pricing/rule/%/delete'] = array(
     'title' => 'Delete Term Pricing Rule',
     'description' => 'Callback to delete a term pricing rule',
