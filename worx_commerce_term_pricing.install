@@ -60,5 +60,26 @@ function worx_commerce_term_pricing_schema() {
     'primary key' => array('tprid'),
   );
 
+  $schema['commerce_term_pricing_node_options'] = array(
+    'description' => 'Holds data about what options are available on a product display',
+    'fields' => array(
+      'nid' => array(
+        'description' => 'Node ID of display',
+        'type' => 'int',
+        'size' => 'normal',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'options_data' => array(
+        'description' => 'Holds the option arrays for product displays',
+        'type' => 'blob',
+        'size' => 'normal',
+        'not null' => TRUE,
+      ),
+    ),
+
+    'primary key' => array('nid'),
+  );
+
   return $schema;
 }
