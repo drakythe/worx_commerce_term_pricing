@@ -217,13 +217,19 @@ function worx_commerce_term_pricing_get_rules() {
 }
 
 function worx_commerce_term_pricing_options_form() {
-  $form = array();
+  $form = $node_options = array();
   $nodes = node_load_multiple(array(), array('type' => 'bulk_product_display'));
+  foreach ($nodes as $node) {
+    $node_options[$node->nid] = $node->title;
+  }
 
+  $form['markup'] = array(
+    '#markup' => "Hi there!",
+  );
   $form['flavor'] = array(
     '#type' => 'select',
-    '#title' => t('Flavor'),
-    '#options' => $nodes,
+    '#title' => t('Product Display'),
+    '#options' => $node_options,
     '#empty_option' => t('-None-'),
     '#default_value' => '',
   );
