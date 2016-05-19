@@ -19,11 +19,11 @@ function worx_commerce_term_pricing_menu() {
   $items['admin/commerce/term_pricing/view'] = array(
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
-  $items['admin/commerce/term_pricing/%/delete'] = array(
+  $items['admin/commerce/term_pricing/rule/%/delete'] = array(
     'title' => 'Delete Term Pricing Rule',
     'description' => 'Callback to delete a term pricing rule',
     'page callback' => 'worx_commerce_term_pricing_delete_rule',
-    'page arguments' => array(3),
+    'page arguments' => array(4),
     'access arguments' => array('worx_commerce_term_pricing_admin'),
     'type' => MENU_CALLBACK,
   );
