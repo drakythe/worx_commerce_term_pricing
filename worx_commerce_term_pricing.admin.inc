@@ -1,6 +1,7 @@
 <?php
 
 function worx_commerce_term_pricing_settings_form() {
+  $flavor_options = $strength_options = $pgvg_options = $bulk_products = array();
   $flavor = taxonomy_vocabulary_machine_name_load('product_flavor');
   $fl_terms = entity_load('taxonomy_term', FALSE, array('vid' => $flavor->vid));
 
@@ -14,7 +15,6 @@ function worx_commerce_term_pricing_settings_form() {
   $st_terms = entity_load('taxonomy_term', FALSE, array('vid' => $strength->vid));
   $pgvg = taxonomy_vocabulary_machine_name_load('product_pg_vg');
   $pgvg_terms = entity_load('taxonomy_term', FALSE, array('vid' => $pgvg->vid));
-  $flavor_options = $strength_options = $pgvg_options = $bulk_products = array();
 
   foreach ($st_terms as $str_obj) {
     $strength_options[$str_obj->tid] = $str_obj->name;
@@ -278,8 +278,53 @@ function worx_commerce_term_pricing_node_option_form() {
   $node = node_load($nid);
   $node_title = $node->title;
 
+  $flavor = taxonomy_vocabulary_machine_name_load('product_flavor');
+  $fl_terms = entity_load('taxonomy_term', FALSE, array('vid' => $flavor->vid));
+  $strength = taxonomy_vocabulary_machine_name_load('product_strength');
+  $st_terms = entity_load('taxonomy_term', FALSE, array('vid' => $strength->vid));
+  $pgvg = taxonomy_vocabulary_machine_name_load('product_pg_vg');
+  $pgvg_terms = entity_load('taxonomy_term', FALSE, array('vid' => $pgvg->vid));
+  $flavor_options = $strength_options = $pgvg_options = array();
+
+  foreach ($fl_terms as $flt_obj) {
+    $flavor_options[$flt_obj->tid] = $flt_obj->name;
+  }
+  foreach ($st_terms as $str_obj) {
+    $strength_options[$str_obj->tid] = $str_obj->name;
+  }
+  foreach ($pgvg_terms as $pgvg_obj) {
+    $pgvg_options[$pgvg_obj->tid] = $pgvg_obj->name;
+  }
+
   $form['my_node'] = array(
     '#markup' => "Set option lists for $node_title",
+  );
+  $form['flavor'] = array(
+    '#type' => 'select',
+    '#title' => t('Flavor'),
+    '#options' => $flavor_options,
+    '#empty_option' => t('-None-'),
+    '#default_value' => '',
+    '#prefix' => '<table><tr><td>',
+    '#suffix' => '</td>',
+  );
+  $form['strength'] = array(
+    '#type' => 'select',
+    '#title' => t('Strength'),
+    '#options' => $strength_options,
+    '#empty_option' => t('-None-'),
+    '#default_value' => '',
+    '#prefix' => '<td>',
+    '#suffix' => '</td>',
+  );
+  $form['pgvg'] = array(
+    '#type' => 'select',
+    '#title' => t('PG/VG Ratio'),
+    '#options' => $pgvg_options,
+    '#empty_option' => t('-None-'),
+    '#default_value' => '',
+    '#prefix' => '<td>',
+    '#suffix' => '</td></tr></table>',
   );
 
   return $form;
