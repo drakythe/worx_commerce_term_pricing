@@ -30,6 +30,16 @@ function worx_commerce_term_pricing_menu() {
     'file path' => drupal_get_path('module', 'worx_commerce_term_pricing'),
     'type' => MENU_LOCAL_TASK,
   );
+  $items['admin/commerce/term_pricing/options/%'] = array(
+    'title' => 'Create/edit Option Sets',
+    'description' => 'Edit or add Bulk Flavor Display Option for Node',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('worx_commerce_term_pricing_node_option_form', '4'),
+    'access arguments' => array('worx_commerce_term_pricing_admin'),
+    'file' => 'worx_commerce_term_pricing.admin.inc',
+    'file path' => drupal_get_path('module', 'worx_commerce_term_pricing'),
+    'type' => MENU_LOCAL_TASK,
+  );
   $items['admin/commerce/term_pricing/rule/%/delete'] = array(
     'title' => 'Delete Term Pricing Rule',
     'description' => 'Callback to delete a term pricing rule',

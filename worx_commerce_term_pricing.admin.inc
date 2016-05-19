@@ -270,3 +270,13 @@ function worx_commerce_term_pricing_options_create_table($unsaved_options, $save
 
   return $output;
 }
+
+function worx_commerce_term_pricing_node_option_form($nid) {
+  $form = array();
+
+  $form['my_node'] = array(
+    '#markup' => $nid,
+  );
+
+  return $form;
+}
