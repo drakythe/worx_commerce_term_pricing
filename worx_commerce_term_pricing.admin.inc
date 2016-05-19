@@ -217,22 +217,56 @@ function worx_commerce_term_pricing_get_rules() {
 }
 
 function worx_commerce_term_pricing_options_form() {
-  $form = $node_options = array();
+  $form = $node_options = $saved_options = array();
   $nodes = node_load_multiple(array(), array('type' => 'bulk_product_display'));
   foreach ($nodes as $node) {
     $node_options[$node->nid] = $node->title;
   }
+  $saved_nodes = db_select('commerce_term_pricing_node_options', 'ctpno')
+    ->fields('ctpno')
+    ->execute();
+  while ($option_set = $saved_nodes->fetchAssoc()) {
+    $saved_options[$option_set['nid']] = $saved_options['options_data'];
+  }
+
+  $unsaved_options = array_diff_key($node_options, $saved_options);
+
+  $table = worx_commerce_term_pricing_options_create_table($unsaved_options, $saved_options);
 
   $form['markup'] = array(
-    '#markup' => "Hi there!",
-  );
-  $form['flavor'] = array(
-    '#type' => 'select',
-    '#title' => t('Product Display'),
-    '#options' => $node_options,
-    '#empty_option' => t('-None-'),
-    '#default_value' => '',
+    '#markup' => $table,
   );
 
   return $form;
+}
+
+function worx_commerce_term_pricing_options_create_table($unsaved_options, $saved_options) {
+  $rows = array();
+  $header = array(
+    array('data' => 'Product', 'field' => 'product', 'sort' => 'ASC'),
+    array('data' => 'Flavor', 'field' => 'flavor', 'sort' => 'ASC'),
+    array('data' => 'Delete', 'field' => 'tprid'),
+  );
+
+  foreach ($saved_options as $nid => $options) {
+    $node = node_load($nid);
+    $title = $node->title;
+    $rows[] = array(
+      $title,
+      '<a href="/admin/commerce/term_pricing/options/' . $nid . '">Edit Option Set Rule</a>',
+      '<a href="/admin/commerce/term_pricing/options/' . $nid . '/delete">Delete Option Set Rule</a>',
+    );
+  }
+  foreach ($unsaved_options as $nid => $title) {
+    $rows[] = array(
+      $title,
+      '<a href="/admin/commerce/term_pricing/options/' . $nid . '">Add Option Set Rule</a>',
+      '<a href="/admin/commerce/term_pricing/options/' . $nid . '/delete">Delete Option Set Rule</a>',
+    );
+  }
+
+  $output = theme('table', array('header' => $header, 'rows' => $rows));
+  $output .= theme('pager');
+
+  return $output;
 }

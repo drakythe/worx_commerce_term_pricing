@@ -22,7 +22,6 @@ function worx_commerce_term_pricing_menu() {
   );
   $items['admin/commerce/term_pricing/options'] = array(
     'title' => 'Display Option Sets',
-    'description' => 'Settings for which options are available on which nodes',
     'description' => 'Review and add Bulk Flavor Display Options',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('worx_commerce_term_pricing_options_form'),
