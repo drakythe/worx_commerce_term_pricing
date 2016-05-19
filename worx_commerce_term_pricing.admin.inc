@@ -271,11 +271,15 @@ function worx_commerce_term_pricing_options_create_table($unsaved_options, $save
   return $output;
 }
 
-function worx_commerce_term_pricing_node_option_form($nid) {
+function worx_commerce_term_pricing_node_option_form() {
   $form = array();
+  $args = arg();
+  $nid = $args[4];
+  $node = node_load($nid);
+  $node_title = $node->title;
 
   $form['my_node'] = array(
-    '#markup' => $nid,
+    '#markup' => "Set option lists for $node_title",
   );
 
   return $form;
