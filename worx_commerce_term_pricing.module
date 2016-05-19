@@ -147,3 +147,21 @@ function worx_commerce_term_pricing_delete_rule($rule_id) {
 
   drupal_goto(drupal_get_destination());
 }
+
+function worx_commerce_term_pricing_node_view_alter(&$build) {
+  $term_price_products = array(
+    '67',
+  );
+  $node = $build['#node'];
+  $nid = $node->nid;
+  if (in_array($nid, $term_price_products)) {
+    $flavors = &$build['field_bulk_liquid'][0]['line_item_fields']['field_bulk_flavor'][LANGUAGE_NONE]['#options'];
+    $allowed_flavors = array(
+      '_none' => '- Select a value -',
+      '83' => 'Acai Berry',
+    );
+    $flavors = array_intersect($allowed_flavors, $flavors);
+    dsm($build);
+    dsm($node);
+  }
+}
