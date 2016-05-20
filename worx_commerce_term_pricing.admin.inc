@@ -295,6 +295,13 @@ function worx_commerce_term_pricing_node_option_form() {
   foreach ($pgvg_terms as $pgvg_obj) {
     $pgvg_options[$pgvg_obj->tid] = $pgvg_obj->name;
   }
+  
+  // @TODO: This is hardcoded.
+  $taxonomies = array(
+    'product_flavor' => 'Flavors',
+    'product_strength' => 'Strength',
+    'product_pg_vf' => 'PG/VG',
+  );
 
   $form['nid'] = array(
     '#type' => 'textfield',
@@ -308,13 +315,22 @@ function worx_commerce_term_pricing_node_option_form() {
   $form['my_node'] = array(
     '#markup' => "Set option lists for $node_title",
   );
+  $form['active_lists'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Available Attributes for this Product'),
+    '#options' => $taxonomies,
+    '#empty_option' => t('-None-'),
+    '#default_value' => array(),
+    '#prefix' => '<table><tr><td>',
+    '#suffix' => '</td></tr>',
+  );
   $form['flavor'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Flavor'),
     '#options' => $flavor_options,
     '#empty_option' => t('-None-'),
     '#default_value' => array(),
-    '#prefix' => '<table><tr><td>',
+    '#prefix' => '<tr><td>',
     '#suffix' => '</td>',
   );
   $form['strength'] = array(
