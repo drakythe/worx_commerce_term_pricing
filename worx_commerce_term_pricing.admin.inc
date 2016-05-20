@@ -296,36 +296,48 @@ function worx_commerce_term_pricing_node_option_form() {
     $pgvg_options[$pgvg_obj->tid] = $pgvg_obj->name;
   }
 
+  $form['nid'] = $nid;
   $form['my_node'] = array(
     '#markup' => "Set option lists for $node_title",
   );
   $form['flavor'] = array(
-    '#type' => 'select',
+    '#type' => 'checkboxes',
     '#title' => t('Flavor'),
     '#options' => $flavor_options,
     '#empty_option' => t('-None-'),
-    '#default_value' => '',
+    '#default_value' => array(),
     '#prefix' => '<table><tr><td>',
     '#suffix' => '</td>',
   );
   $form['strength'] = array(
-    '#type' => 'select',
+    '#type' => 'checkboxes',
     '#title' => t('Strength'),
     '#options' => $strength_options,
     '#empty_option' => t('-None-'),
-    '#default_value' => '',
+    '#default_value' => array(),
     '#prefix' => '<td>',
     '#suffix' => '</td>',
   );
   $form['pgvg'] = array(
-    '#type' => 'select',
+    '#type' => 'checkboxes',
     '#title' => t('PG/VG Ratio'),
     '#options' => $pgvg_options,
     '#empty_option' => t('-None-'),
-    '#default_value' => '',
+    '#default_value' => array(),
     '#prefix' => '<td>',
     '#suffix' => '</td></tr></table>',
   );
 
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save')
+  );
+
   return $form;
+}
+
+function worx_commerce_term_pricing_node_option_form_submit($form, &$form_state) {
+  dsm($form['nid']);
+  dsm($form_state['values']);
+  $submission_array = array();
 }
