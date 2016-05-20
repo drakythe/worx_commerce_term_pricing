@@ -169,28 +169,36 @@ function worx_commerce_term_pricing_delete_rule($rule_id) {
   drupal_goto(drupal_get_destination());
 }
 
-function worx_commerce_term_pricing_node_view_alter(&$build) {
-  $node = $build['#node'];
-  $nid = $node->nid;
+function worx_commerce_term_pricing_form_alter(&$form, &$form_state, $form_id) {
+  if (strpos($form_id, 'commerce_cart_add_to_cart_form') !== FALSE) {
+    $args = arg();
+    $nid = $args[1];
+    if (is_numeric($nid)) {
+      $form_state['worx_commerce_term_pricing_nid'] = $nid;
+    }
+    else {
+      $nid = $form_state['worx_commerce_term_pricing_nid'];
+    }
 
-  $exists = db_select('commerce_term_pricing_node_options', 'ctpno')
-    ->fields('ctpno')
-    ->condition('nid', $nid)
-    ->execute()
-    ->fetchAssoc();
+    $exists = db_select('commerce_term_pricing_node_options', 'ctpno')
+      ->fields('ctpno')
+      ->condition('nid', $nid)
+      ->execute()
+      ->fetchAssoc();
 
-  if (!empty($exists)) {
-    $none_option = array('_none' => '- Select a value -');
-    $options = unserialize($exists['options_data']);
-    $set_flavors = $none_option + $options['flavors'];
-    $set_strength = $none_option + $options['strength'];
-    $set_pgvg = $none_option + $options['pgvg'];
+    if (!empty($exists)) {
+      $none_option = array('_none' => '- Select a value -');
+      $options = unserialize($exists['options_data']);
+      $set_flavors = $none_option + $options['flavors'];
+      $set_strength = $none_option + $options['strength'];
+      $set_pgvg = $none_option + $options['pgvg'];
 
-    $flavors = &$build['field_bulk_liquid'][0]['line_item_fields']['field_bulk_flavor'][LANGUAGE_NONE]['#options'];
-    $strength = &$build['field_bulk_liquid'][0]['line_item_fields']['field_bulk_strength'][LANGUAGE_NONE]['#options'];
-    $pgvg = &$build['field_bulk_liquid'][0]['line_item_fields']['field_bulk_pg_vg'][LANGUAGE_NONE]['#options'];
-    $flavors = array_intersect_key($flavors, $set_flavors);
-    $strength = array_intersect_key($flavors, $set_strength);
-    $pgvg = array_intersect_key($flavors, $set_pgvg);
+      $flavors = &$form['line_item_fields']['field_bulk_flavor'][LANGUAGE_NONE]['#options'];
+      $strength = &$form['line_item_fields']['field_bulk_strength'][LANGUAGE_NONE]['#options'];
+      $pgvg = &$form['line_item_fields']['field_bulk_pg_vg'][LANGUAGE_NONE]['#options'];
+      $flavors = array_intersect_key($flavors, $set_flavors);
+      $strength = array_intersect_key($flavors, $set_strength);
+      $pgvg = array_intersect_key($flavors, $set_pgvg);
+    }
   }
 }
