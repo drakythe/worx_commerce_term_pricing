@@ -295,6 +295,13 @@ function worx_commerce_term_pricing_node_option_form() {
   foreach ($pgvg_terms as $pgvg_obj) {
     $pgvg_options[$pgvg_obj->tid] = $pgvg_obj->name;
   }
+  $exists = db_select('commerce_term_pricing_node_options', 'ctpno')
+    ->fields('ctpno')
+    ->condition('nid', $nid)
+    ->execute()
+    ->fetchAssoc();
+  dsm($exists);
+  dsm(unserialize($exists['options_data']));
 
   $form['nid'] = array(
     '#type' => 'textfield',
@@ -349,6 +356,14 @@ function worx_commerce_term_pricing_node_option_form_submit($form, &$form_state)
   $flavors = array_filter($form_state['values']['flavor']);
   $strength = array_filter($form_state['values']['strength']);
   $pgvg = array_filter($form_state['values']['pgvg']);
+
+  $exists = db_select('commerce_term_pricing_node_options', 'ctpno')
+    ->fields('ctpno')
+    ->condition('nid', $nid)
+    ->execute()
+    ->fetchAssoc();
+  dsm($exists);
+  // @TODO: Handle updating as well as new.
   
   $record = array(
     'nid' => $nid,
