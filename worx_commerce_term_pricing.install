@@ -71,10 +71,12 @@ function worx_commerce_term_pricing_schema() {
         'default' => 0,
       ),
       'options_data' => array(
-        'description' => 'Holds the option arrays for product displays',
-        'type' => 'blob',
-        'size' => 'normal',
+        'type' => 'text',
+        'size' => 'big',
+        'description' => 'Serialized Option Set.',
         'not null' => TRUE,
+        'serialize' => TRUE,
+        'object default' => array(),
       ),
     ),
 

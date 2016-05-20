@@ -349,9 +349,15 @@ function worx_commerce_term_pricing_node_option_form_submit($form, &$form_state)
   $flavors = array_filter($form_state['values']['flavor']);
   $strength = array_filter($form_state['values']['strength']);
   $pgvg = array_filter($form_state['values']['pgvg']);
-  dsm($nid);
-  dsm($flavors);
-  dsm($strength);
-  dsm($pgvg);
-  $submission_array = array();
+  
+  $record = array(
+    'nid' => $nid,
+    'options_data' => array(
+      'flavors' => $flavors,
+      'strength' => $strength,
+      'pgvg' => $pgvg,
+    ),
+  );
+  
+  drupal_write_record('commerce_term_pricing_node_options', $record);
 }
