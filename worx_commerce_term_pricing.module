@@ -170,19 +170,26 @@ function worx_commerce_term_pricing_delete_rule($rule_id) {
 }
 
 function worx_commerce_term_pricing_node_view_alter(&$build) {
-  $term_price_products = array(
-    '67',
-  );
   $node = $build['#node'];
   $nid = $node->nid;
-  if (in_array($nid, $term_price_products)) {
+
+  $exists = db_select('commerce_term_pricing_node_options', 'ctpno')
+    ->fields('ctpno')
+    ->condition('nid', $nid)
+    ->execute()
+    ->fetchAssoc();
+
+  if (!empty($exists)) {
+    $options = unserialize($exists['options_data']);
+    $set_flavors = array_unshift($options['flavors'], array('_none' => '- Select a value -'));
+    $set_strength = array_unshift($options['strength'], array('_none' => '- Select a value -'));
+    $set_pgvg = array_unshift($options['pgvg'], array('_none' => '- Select a value -'));
+
     $flavors = &$build['field_bulk_liquid'][0]['line_item_fields']['field_bulk_flavor'][LANGUAGE_NONE]['#options'];
-    $allowed_flavors = array(
-      '_none' => '- Select a value -',
-      '83' => 'Acai Berry',
-    );
-    $flavors = array_intersect($allowed_flavors, $flavors);
-    dsm($build);
-    dsm($node);
+    $strength = &$build['field_bulk_liquid'][0]['line_item_fields']['field_bulk_strength'][LANGUAGE_NONE]['#options'];
+    $pgvg = &$build['field_bulk_liquid'][0]['line_item_fields']['field_bulk_pg_vg'][LANGUAGE_NONE]['#options'];
+    $flavors = array_intersect_key($flavors, $set_flavors);
+    $strength = array_intersect_key($flavors, $set_strength);
+    $pgvg = array_intersect_key($flavors, $set_pgvg);
   }
 }

@@ -295,13 +295,6 @@ function worx_commerce_term_pricing_node_option_form() {
   foreach ($pgvg_terms as $pgvg_obj) {
     $pgvg_options[$pgvg_obj->tid] = $pgvg_obj->name;
   }
-  $exists = db_select('commerce_term_pricing_node_options', 'ctpno')
-    ->fields('ctpno')
-    ->condition('nid', $nid)
-    ->execute()
-    ->fetchAssoc();
-  dsm($exists);
-  dsm(unserialize($exists['options_data']));
 
   $form['nid'] = array(
     '#type' => 'textfield',
