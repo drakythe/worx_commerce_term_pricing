@@ -321,8 +321,8 @@ function worx_commerce_term_pricing_node_option_form() {
     '#options' => $taxonomies,
     '#empty_option' => t('-None-'),
     '#default_value' => array(),
-    '#prefix' => '<table><tr><td>',
-    '#suffix' => '</td></tr>',
+    '#prefix' => '<table><tr>',
+    '#suffix' => '</tr>',
   );
   $form['flavor'] = array(
     '#type' => 'checkboxes',
