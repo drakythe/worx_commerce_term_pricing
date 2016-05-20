@@ -296,7 +296,15 @@ function worx_commerce_term_pricing_node_option_form() {
     $pgvg_options[$pgvg_obj->tid] = $pgvg_obj->name;
   }
 
-  $form['nid'] = $nid;
+  $form['nid'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Node'),
+    '#default_value' => $nid,
+    '#size' => 25,
+    '#maxlength' => 100,
+    '#required' => TRUE,
+    '#access' => FALSE,
+  );
   $form['my_node'] = array(
     '#markup' => "Set option lists for $node_title",
   );
@@ -337,7 +345,6 @@ function worx_commerce_term_pricing_node_option_form() {
 }
 
 function worx_commerce_term_pricing_node_option_form_submit($form, &$form_state) {
-  dsm($form['nid']);
   dsm($form_state['values']);
   $submission_array = array();
 }
