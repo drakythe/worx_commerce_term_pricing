@@ -345,7 +345,7 @@ function worx_commerce_term_pricing_node_option_form() {
 }
 
 function worx_commerce_term_pricing_node_option_form_submit($form, &$form_state) {
-  $nid = array_filter($form_state['values']['nid']);
+  $nid = $form_state['values']['nid'];
   $flavors = array_filter($form_state['values']['flavor']);
   $strength = array_filter($form_state['values']['strength']);
   $pgvg = array_filter($form_state['values']['pgvg']);
