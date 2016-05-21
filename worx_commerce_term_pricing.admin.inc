@@ -1,6 +1,7 @@
 <?php
 
 function worx_commerce_term_pricing_settings_form() {
+  // @TODO: This is hardcoded. Fix it later.
   $flavor_options = $strength_options = $pgvg_options = $bulk_products = array();
   $flavor = taxonomy_vocabulary_machine_name_load('product_flavor');
   $fl_terms = entity_load('taxonomy_term', FALSE, array('vid' => $flavor->vid));
@@ -295,8 +296,20 @@ function worx_commerce_term_pricing_node_option_form() {
   foreach ($pgvg_terms as $pgvg_obj) {
     $pgvg_options[$pgvg_obj->tid] = $pgvg_obj->name;
   }
-  
-  // @TODO: This is hardcoded.
+
+  $defaults = db_select('commerce_term_pricing_node_options', 'ctpno')
+    ->fields('ctpno')
+    ->condition('nid', $nid)
+    ->execute()
+    ->fetchAssoc();
+  $options = unserialize($defaults['options_data']);
+  $set_flavors = $options['flavors'];
+  $set_strength = $options['strength'];
+  $set_pgvg = $options['pgvg'];
+  $set_lists = $options['active_lists'];
+
+
+  // @TODO: This is hardcoded. Needs to be dynamic.
   $taxonomies = array(
     'product_flavor' => 'Flavors',
     'product_strength' => 'Strength',
@@ -318,9 +331,10 @@ function worx_commerce_term_pricing_node_option_form() {
   $form['active_lists'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Available Attributes for this Product'),
+    '#description' => t('Select if an attribute is available when adding a product to the cart.'),
     '#options' => $taxonomies,
     '#empty_option' => t('-None-'),
-    '#default_value' => array(),
+    '#default_value' => $set_lists,
     '#prefix' => '<table><tr>',
     '#suffix' => '</tr>',
   );
@@ -329,7 +343,7 @@ function worx_commerce_term_pricing_node_option_form() {
     '#title' => t('Flavor'),
     '#options' => $flavor_options,
     '#empty_option' => t('-None-'),
-    '#default_value' => array(),
+    '#default_value' => $set_flavors,
     '#prefix' => '<tr><td>',
     '#suffix' => '</td>',
   );
@@ -338,7 +352,7 @@ function worx_commerce_term_pricing_node_option_form() {
     '#title' => t('Strength'),
     '#options' => $strength_options,
     '#empty_option' => t('-None-'),
-    '#default_value' => array(),
+    '#default_value' => $set_strength,
     '#prefix' => '<td>',
     '#suffix' => '</td>',
   );
@@ -347,7 +361,7 @@ function worx_commerce_term_pricing_node_option_form() {
     '#title' => t('PG/VG Ratio'),
     '#options' => $pgvg_options,
     '#empty_option' => t('-None-'),
-    '#default_value' => array(),
+    '#default_value' => $set_pgvg,
     '#prefix' => '<td>',
     '#suffix' => '</td></tr></table>',
   );
@@ -365,23 +379,28 @@ function worx_commerce_term_pricing_node_option_form_submit($form, &$form_state)
   $flavors = array_filter($form_state['values']['flavor']);
   $strength = array_filter($form_state['values']['strength']);
   $pgvg = array_filter($form_state['values']['pgvg']);
+  $lists = array_filter($form_state['values']['active_lists']);
 
   $exists = db_select('commerce_term_pricing_node_options', 'ctpno')
     ->fields('ctpno')
     ->condition('nid', $nid)
     ->execute()
     ->fetchAssoc();
-  dsm($exists);
-  // @TODO: Handle updating as well as new.
-  
+
   $record = array(
     'nid' => $nid,
     'options_data' => array(
+      'active_lists' => $lists,
       'flavors' => $flavors,
       'strength' => $strength,
       'pgvg' => $pgvg,
     ),
   );
-  
-  drupal_write_record('commerce_term_pricing_node_options', $record);
+
+  if (!empty($exists)) {
+    drupal_write_record('commerce_term_pricing_node_options', $record, 'nid');
+  }
+  else {
+    drupal_write_record('commerce_term_pricing_node_options', $record);
+  }
 }

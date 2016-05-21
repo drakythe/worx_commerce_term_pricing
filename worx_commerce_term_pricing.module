@@ -160,6 +160,8 @@ function worx_commerce_term_pricing_calculate_price($line_item) {
 }
 
 function worx_commerce_term_pricing_delete_rule($rule_id) {
+  // @TODO: Setup a "nothing to delete" return for if we get here and don't find
+  // a valid record.
   $deleted = db_delete('commerce_term_pricing_rules')
     ->condition('tprid', $rule_id)
     ->execute();
