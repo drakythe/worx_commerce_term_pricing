@@ -195,6 +195,31 @@ function worx_commerce_term_pricing_form_alter(&$form, &$form_state, $form_id) {
       $set_strength = $none_option + $options['strength'];
       $set_pgvg = $none_option + $options['pgvg'];
 
+      // Hide the fields until we determine they are available on this product.
+      $form['line_item_fields']['field_bulk_flavor']['#access'] = FALSE;
+      $form['line_item_fields']['field_bulk_strength']['#access'] = FALSE;
+      $form['line_item_fields']['field_bulk_pg_vg']['#access'] = FALSE;
+
+      // Check which fields are active for this node and enable/require them.
+      $lists = $options['active_lists'];
+      foreach ($lists as $attribute) {
+        // @TODO: This is hardcoded.
+        switch ($attribute) {
+          case 'product_flavor':
+            $form['line_item_fields']['field_bulk_flavor']['#access'] = TRUE;
+            $form['line_item_fields']['field_bulk_flavor'][LANGUAGE_NONE]['#required'] = TRUE;
+            break;
+          case 'product_strength':
+            $form['line_item_fields']['field_bulk_strength']['#access'] = TRUE;
+            $form['line_item_fields']['field_bulk_strength'][LANGUAGE_NONE]['#required'] = TRUE;
+            break;
+          case 'product_pg_vg':
+            $form['line_item_fields']['field_bulk_pg_vg']['#access'] = TRUE;
+            $form['line_item_fields']['field_bulk_pg_vg'][LANGUAGE_NONE]['#required'] = TRUE;
+            break;
+        }
+      }
+
       $flavors = &$form['line_item_fields']['field_bulk_flavor'][LANGUAGE_NONE]['#options'];
       $strength = &$form['line_item_fields']['field_bulk_strength'][LANGUAGE_NONE]['#options'];
       $pgvg = &$form['line_item_fields']['field_bulk_pg_vg'][LANGUAGE_NONE]['#options'];
