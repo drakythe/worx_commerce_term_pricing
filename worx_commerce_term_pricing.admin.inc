@@ -206,7 +206,7 @@ function worx_commerce_term_pricing_get_rules() {
       $title,
       $flavor_name,
       $row->price_change,
-      $row->change_type,
+      $row->change_type, // @TODO: Fix this with l().
       '<a href="/admin/commerce/term_pricing/rule/' . $row->tprid . '/delete?destination=/admin/commerce/term_pricing">Delete</a>',
     );
   }
@@ -313,7 +313,7 @@ function worx_commerce_term_pricing_node_option_form() {
   $taxonomies = array(
     'product_flavor' => 'Flavors',
     'product_strength' => 'Strength',
-    'product_pg_vf' => 'PG/VG',
+    'product_pg_vg' => 'PG/VG',
   );
 
   $form['nid'] = array(
@@ -366,12 +366,32 @@ function worx_commerce_term_pricing_node_option_form() {
     '#suffix' => '</td></tr></table>',
   );
 
+  $form['#validate'][] = 'worx_commerce_term_pricing_options_validate';
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save')
   );
 
   return $form;
+}
+
+function worx_commerce_term_pricing_options_validate($form, $form_state) {
+  $flavors = array_filter($form_state['values']['flavor']);
+  $strength = array_filter($form_state['values']['strength']);
+  $pgvg = array_filter($form_state['values']['pgvg']);
+  $lists = array_filter($form_state['values']['active_lists']);
+
+  if (isset($lists['product_flavor']) && empty($flavors)) {
+    form_set_error('flavor', 'Flavor cannot be be enabled as an attribute without any options enabled.');
+  }
+  if (isset($lists['product_strength']) && empty($strength)) {
+    form_set_error('strength', 'Strength cannot be be enabled as an attribute without any options enabled.');
+  }
+  if (isset($lists['product_pg_vg']) && empty($strength)) {
+    form_set_error('pgvg', 'PG/VG cannot be be enabled as an attribute without any options enabled.');
+  }
+
+
 }
 
 function worx_commerce_term_pricing_node_option_form_submit($form, &$form_state) {
