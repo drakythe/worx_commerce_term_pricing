@@ -228,7 +228,7 @@ function worx_commerce_term_pricing_options_form() {
     ->execute();
   while ($option_set = $saved_nodes->fetchAssoc()) {
     if (!isset($saved_options['options_data'])) {
-      return '';
+      return 'No Rules Created';
     }
     $saved_options[$option_set['nid']] = $saved_options['options_data'];
   }
