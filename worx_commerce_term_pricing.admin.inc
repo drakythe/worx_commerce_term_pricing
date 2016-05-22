@@ -227,6 +227,9 @@ function worx_commerce_term_pricing_options_form() {
     ->fields('ctpno')
     ->execute();
   while ($option_set = $saved_nodes->fetchAssoc()) {
+    if (!isset($saved_options['options_data'])) {
+      return '';
+    }
     $saved_options[$option_set['nid']] = $saved_options['options_data'];
   }
 
