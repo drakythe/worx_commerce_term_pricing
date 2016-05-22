@@ -48,6 +48,14 @@ function worx_commerce_term_pricing_menu() {
     'access arguments' => array('worx_commerce_term_pricing_admin'),
     'type' => MENU_CALLBACK,
   );
+  $items['admin/commerce/term_pricing/options/%/delete'] = array(
+    'title' => 'Delete Display Option Set',
+    'description' => 'Callback to delete a Product Display option set',
+    'page callback' => 'worx_commerce_term_pricing_delete_option',
+    'page arguments' => array(4),
+    'access arguments' => array('worx_commerce_term_pricing_admin'),
+    'type' => MENU_CALLBACK,
+  );
 
   return $items;
 }
@@ -167,6 +175,18 @@ function worx_commerce_term_pricing_delete_rule($rule_id) {
     ->execute();
 
   drupal_set_message('Pricing Rule Deleted');
+
+  drupal_goto(drupal_get_destination());
+}
+
+function worx_commerce_term_pricing_delete_option($nid) {
+  // @TODO: Setup a "nothing to delete" return for if we get here and don't find
+  // a valid record.
+  $deleted = db_delete('commerce_term_pricing_node_options')
+    ->condition('ctpno', $nid)
+    ->execute();
+
+  drupal_set_message('Option Set Deleted');
 
   drupal_goto(drupal_get_destination());
 }

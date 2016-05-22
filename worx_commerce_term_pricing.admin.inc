@@ -207,7 +207,7 @@ function worx_commerce_term_pricing_get_rules() {
       $flavor_name,
       $row->price_change,
       $row->change_type, // @TODO: Fix this with l().
-      '<a href="/admin/commerce/term_pricing/rule/' . $row->tprid . '/delete?destination=/admin/commerce/term_pricing">Delete</a>',
+      l('Delete', 'admin/commerce/term_pricing/rule/' . $row->tprid . '/delete?destination=/admin/commerce/term_pricing'),
     );
   }
 
