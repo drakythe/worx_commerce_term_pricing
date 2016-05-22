@@ -227,10 +227,9 @@ function worx_commerce_term_pricing_options_form() {
     ->fields('ctpno')
     ->execute();
   while ($option_set = $saved_nodes->fetchAssoc()) {
-    if (!isset($saved_options['options_data'])) {
-      return 'No Rules Created';
+    if (isset($saved_options['options_data'])) {
+      $saved_options[$option_set['nid']] = $saved_options['options_data'];
     }
-    $saved_options[$option_set['nid']] = $saved_options['options_data'];
   }
 
   $unsaved_options = array_diff_key($node_options, $saved_options);
