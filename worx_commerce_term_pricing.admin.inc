@@ -206,7 +206,7 @@ function worx_commerce_term_pricing_get_rules() {
       $title,
       $flavor_name,
       $row->price_change,
-      $row->change_type, // @TODO: Fix this with l().
+      $row->change_type, 
       l('Delete', 'admin/commerce/term_pricing/rule/' . $row->tprid . '/delete', array('query' => array('destination' => '/admin/commerce/term_pricing')))
     );
   }
@@ -226,8 +226,9 @@ function worx_commerce_term_pricing_options_form() {
   $saved_nodes = db_select('commerce_term_pricing_node_options', 'ctpno')
     ->fields('ctpno')
     ->execute();
+
   while ($option_set = $saved_nodes->fetchAssoc()) {
-    if (isset($saved_options['options_data'])) {
+    if (isset($option_set['options_data'])) {
       $saved_options[$option_set['nid']] = $saved_options['options_data'];
     }
   }
@@ -257,14 +258,14 @@ function worx_commerce_term_pricing_options_create_table($unsaved_options, $save
     $rows[] = array(
       $title,
       l("Edit Option Set Rule", 'admin/commerce/term_pricing/options/' . $nid),
-      l("Delete Option Set Rule", 'admin/commerce/term_pricing/options/' . $nid . '/delete'),
+      l("Delete Option Set Rule", 'admin/commerce/term_pricing/options/' . $nid . '/delete', array('query' => array('destination' => '/admin/commerce/term_pricing/options'))),
     );
   }
   foreach ($unsaved_options as $nid => $title) {
     $rows[] = array(
       $title,
       l("Add Option Set Rule", 'admin/commerce/term_pricing/options/' . $nid),
-      l("Delete Option Set Rule", 'admin/commerce/term_pricing/options/' . $nid . '/delete'),
+      "No option set created",
     );
   }
 
@@ -305,10 +306,10 @@ function worx_commerce_term_pricing_node_option_form() {
     ->execute()
     ->fetchAssoc();
   $options = unserialize($defaults['options_data']);
-  $set_flavors = $options['flavors'];
-  $set_strength = $options['strength'];
-  $set_pgvg = $options['pgvg'];
-  $set_lists = $options['active_lists'];
+  isset($options['flavors']) ? $set_flavors = $options['flavors'] : $set_flavors = array();
+  isset($options['strength']) ? $set_strength = $options['strength'] : $set_strength = array();
+  isset($options['pgvg']) ? $set_pgvg = $options['pgvg'] : $set_pgvg = array();
+  isset($options['active_lists']) ? $set_lists = $options['active_lists'] : $set_lists = array();
 
 
   // @TODO: This is hardcoded. Needs to be dynamic.
