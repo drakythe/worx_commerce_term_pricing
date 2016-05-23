@@ -256,15 +256,15 @@ function worx_commerce_term_pricing_options_create_table($unsaved_options, $save
     $title = $node->title;
     $rows[] = array(
       $title,
-      l("Edit Option Set Rule", 'admin/commerce/term_pricing/options' . $nid),
-      l("Delete Option Set Rule", 'admin/commerce/term_pricing/options' . $nid . '/delete'),
+      l("Edit Option Set Rule", 'admin/commerce/term_pricing/options/' . $nid),
+      l("Delete Option Set Rule", 'admin/commerce/term_pricing/options/' . $nid . '/delete'),
     );
   }
   foreach ($unsaved_options as $nid => $title) {
     $rows[] = array(
       $title,
-      l("Add Option Set Rule", 'admin/commerce/term_pricing/options' . $nid),
-      l("Delete Option Set Rule", 'admin/commerce/term_pricing/options' . $nid . '/delete'),
+      l("Add Option Set Rule", 'admin/commerce/term_pricing/options/' . $nid),
+      l("Delete Option Set Rule", 'admin/commerce/term_pricing/options/' . $nid . '/delete'),
     );
   }
 
