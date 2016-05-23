@@ -229,7 +229,7 @@ function worx_commerce_term_pricing_options_form() {
 
   while ($option_set = $saved_nodes->fetchAssoc()) {
     if (isset($option_set['options_data'])) {
-      $saved_options[$option_set['nid']] = $saved_options['options_data'];
+      $saved_options[$option_set['nid']] = $option_set['options_data'];
     }
   }
 
