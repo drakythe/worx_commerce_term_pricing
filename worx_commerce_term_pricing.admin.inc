@@ -247,7 +247,7 @@ function worx_commerce_term_pricing_options_create_table($unsaved_options, $save
   $rows = array();
   $header = array(
     array('data' => 'Product', 'field' => 'product', 'sort' => 'ASC'),
-    array('data' => 'Flavor', 'field' => 'flavor', 'sort' => 'ASC'),
+    array('data' => 'Edit', 'field' => 'edit'),
     array('data' => 'Delete', 'field' => 'tprid'),
   );
 
@@ -256,15 +256,15 @@ function worx_commerce_term_pricing_options_create_table($unsaved_options, $save
     $title = $node->title;
     $rows[] = array(
       $title,
-      '<a href="/admin/commerce/term_pricing/options/' . $nid . '">Edit Option Set Rule</a>',
-      '<a href="/admin/commerce/term_pricing/options/' . $nid . '/delete">Delete Option Set Rule</a>',
+      l("Edit Option Set Rule", 'admin/commerce/term_pricing/options' . $nid),
+      l("Delete Option Set Rule", 'admin/commerce/term_pricing/options' . $nid . '/delete'),
     );
   }
   foreach ($unsaved_options as $nid => $title) {
     $rows[] = array(
       $title,
-      '<a href="/admin/commerce/term_pricing/options/' . $nid . '">Add Option Set Rule</a>',
-      '<a href="/admin/commerce/term_pricing/options/' . $nid . '/delete">Delete Option Set Rule</a>',
+      l("Add Option Set Rule", 'admin/commerce/term_pricing/options' . $nid),
+      l("Delete Option Set Rule", 'admin/commerce/term_pricing/options' . $nid . '/delete'),
     );
   }
 

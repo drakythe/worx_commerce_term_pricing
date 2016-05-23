@@ -183,7 +183,7 @@ function worx_commerce_term_pricing_delete_option($nid) {
   // @TODO: Setup a "nothing to delete" return for if we get here and don't find
   // a valid record.
   $deleted = db_delete('commerce_term_pricing_node_options')
-    ->condition('ctpno', $nid)
+    ->condition('nid', $nid)
     ->execute();
 
   drupal_set_message('Option Set Deleted');
