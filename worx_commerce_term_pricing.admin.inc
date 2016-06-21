@@ -390,7 +390,7 @@ function worx_commerce_term_pricing_options_validate($form, $form_state) {
   if (isset($lists['product_strength']) && empty($strength)) {
     form_set_error('strength', 'Strength cannot be be enabled as an attribute without any options enabled.');
   }
-  if (isset($lists['product_pg_vg']) && empty($strength)) {
+  if (isset($lists['product_pg_vg']) && empty($pgvg)) {
     form_set_error('pgvg', 'PG/VG cannot be be enabled as an attribute without any options enabled.');
   }
 
