@@ -247,8 +247,8 @@ function worx_commerce_term_pricing_form_alter(&$form, &$form_state, $form_id) {
         $strength = &$form['line_item_fields']['field_bulk_strength'][LANGUAGE_NONE]['#options'];
         $pgvg = &$form['line_item_fields']['field_bulk_pg_vg'][LANGUAGE_NONE]['#options'];
         $flavors = array_intersect_key($flavors, $set_flavors);
-        $strength = array_intersect_key($flavors, $set_strength);
-        $pgvg = array_intersect_key($flavors, $set_pgvg);
+        $strength = array_intersect_key($strength, $set_strength);
+        $pgvg = array_intersect_key($pgvg, $set_pgvg);
       }
     }
   }
