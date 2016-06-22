@@ -1,0 +1,6 @@
+.page-admin-commerce-term-pricing-options- #edit-flavor,
+.page-admin-commerce-term-pricing-options- #edit-strength,
+.page-admin-commerce-term-pricing-options- #edit-pgvg {
+  max-height: 400px;
+  overflow: auto;
+}
