@@ -17,7 +17,7 @@ function worx_commerce_term_pricing_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
   $items['admin/commerce/term_pricing/view'] = array(
-    'title' => 'View',
+    'title' => 'Term Pricing',
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
   $items['admin/commerce/term_pricing/options'] = array(
