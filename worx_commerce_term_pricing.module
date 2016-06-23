@@ -38,7 +38,7 @@ function worx_commerce_term_pricing_menu() {
     'access arguments' => array('worx_commerce_term_pricing_admin'),
     'file' => 'worx_commerce_term_pricing.admin.inc',
     'file path' => drupal_get_path('module', 'worx_commerce_term_pricing'),
-    'type' => MENU_LOCAL_TASK,
+    'type' => MENU_NORMAL_ITEM,
   );
   $items['admin/commerce/term_pricing/rule/%/delete'] = array(
     'title' => 'Delete Term Pricing Rule',
