@@ -117,11 +117,8 @@ function worx_commerce_term_pricing_calculate_price($line_item) {
     );
   }
   */
+  // @TODO: Need to make this dynamic. along with the rest.
   $flavor = $line_item->field_bulk_flavor[LANGUAGE_NONE][0]['tid'];
-  // @TODO: We won't be using these rules to begin with, but may enable them
-  // later.
-  //$pgvg = $line_item->field_bulk_pg_vg[LANGUAGE_NONE][0]['tid'];
-  //$strength = $line_item->field_bulk_strength[LANGUAGE_NONE][0]['tid'];
 
   // First we see if a rule matches both the flavor & SKU
   $query = db_select('commerce_term_pricing_rules', 'ctpr')
@@ -214,11 +211,18 @@ function worx_commerce_term_pricing_form_alter(&$form, &$form_state, $form_id) {
       if (!empty($exists)) {
         $none_option = array('_none' => '- Select a value -');
         $options = unserialize($exists['options_data']);
+        //@TODO: Update this hardcoded option set.
+        // The options should be set on a per node basis. Perhaps in a new table
+        // which we can then lookup on this form alter, because we'll have the
+        // node. The table would be the nid and a serialized array of which
+        // options are enabled on it, then loop through those options and create
+        // variables to set the form field options.
         $set_flavors = $none_option + $options['flavors'];
         $set_strength = $none_option + $options['strength'];
         $set_pgvg = $none_option + $options['pgvg'];
 
         // Hide the fields until we determine they are available on this product.
+        // @Todo this would be contained in the above TODO loop.
         $form['line_item_fields']['field_bulk_flavor']['#access'] = FALSE;
         $form['line_item_fields']['field_bulk_strength']['#access'] = FALSE;
         $form['line_item_fields']['field_bulk_pg_vg']['#access'] = FALSE;
@@ -226,7 +230,8 @@ function worx_commerce_term_pricing_form_alter(&$form, &$form_state, $form_id) {
         // Check which fields are active for this node and enable/require them.
         $lists = $options['active_lists'];
         foreach ($lists as $attribute) {
-          // @TODO: This is hardcoded.
+          // @TODO: This is hardcoded. Need to figure out how to dynamically
+          // loop through the above values and set the appropriate options below
           switch ($attribute) {
             case 'product_flavor':
               $form['line_item_fields']['field_bulk_flavor']['#access'] = TRUE;
@@ -243,6 +248,7 @@ function worx_commerce_term_pricing_form_alter(&$form, &$form_state, $form_id) {
           }
         }
 
+        // @TODO: Again, this needs to be dynamic.
         $flavors = &$form['line_item_fields']['field_bulk_flavor'][LANGUAGE_NONE]['#options'];
         $strength = &$form['line_item_fields']['field_bulk_strength'][LANGUAGE_NONE]['#options'];
         $pgvg = &$form['line_item_fields']['field_bulk_pg_vg'][LANGUAGE_NONE]['#options'];

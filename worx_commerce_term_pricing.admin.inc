@@ -1,7 +1,16 @@
 <?php
 
+/**
+ * @TODO: The form should list the fields available on the line item type
+ * attached to the node. Once selected and submitted, create option fields.
+ * For text fields, a label and a required status
+ * For term_lists, an option set to set which options are available and a
+ *  required status
+ * For image upload field, a max number of images dropdown.
+ */
+
 function worx_commerce_term_pricing_settings_form() {
-  // @TODO: This is hardcoded. Fix it later.
+  // @TODO: Need to dynamically create an array of variables
   $flavor_options = $strength_options = $pgvg_options = $bulk_products = array();
   $flavor = taxonomy_vocabulary_machine_name_load('product_flavor');
   $fl_terms = entity_load('taxonomy_term', FALSE, array('vid' => $flavor->vid));
@@ -9,22 +18,6 @@ function worx_commerce_term_pricing_settings_form() {
   foreach ($fl_terms as $flt_obj) {
     $flavor_options[$flt_obj->tid] = $flt_obj->name;
   }
-  // @TODO: We won't be using these rules to begin with, but may enable them
-  // later.
-  /**
-  $strength = taxonomy_vocabulary_machine_name_load('product_strength');
-  $st_terms = entity_load('taxonomy_term', FALSE, array('vid' => $strength->vid));
-  $pgvg = taxonomy_vocabulary_machine_name_load('product_pg_vg');
-  $pgvg_terms = entity_load('taxonomy_term', FALSE, array('vid' => $pgvg->vid));
-
-  foreach ($st_terms as $str_obj) {
-    $strength_options[$str_obj->tid] = $str_obj->name;
-  }
-  foreach ($pgvg_terms as $pgvg_obj) {
-    $pgvg_options[$pgvg_obj->tid] = $pgvg_obj->name;
-  }
-  */
-
   $query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'commerce_product')
     ->entityCondition('bundle', 'term_priced')

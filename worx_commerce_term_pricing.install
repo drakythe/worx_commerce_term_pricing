@@ -1,4 +1,6 @@
 <?php
+// @TODO: Probably just need to move on to version 2.0 and note there is no
+// upgrade path.
 
 
 function worx_commerce_term_pricing_schema() {
