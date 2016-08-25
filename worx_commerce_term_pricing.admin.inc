@@ -333,11 +333,17 @@ function worx_commerce_term_pricing_node_option_form() {
   // and create them.
   foreach ($list_fields as $list_field => $list_label) {
     if (array_key_exists($list_field, $set_lists)) {
-      $form[$list_field . '_required'] = array(
+      $form[$list_field] = array(
+        '#type' => 'fieldset',
+        '#title' => t($list_label),
+        '#collapsible' => TRUE, // Added
+        '#collapsed' => FALSE,  // Added
+      );
+      $form[$list_field][$list_field . '_required'] = array(
         '#type' => 'checkbox',
         '#title' => t($list_label . ' Field Required?.'),
       );
-      $form[$list_field . '_label'] = array(
+      $form[$list_field][$list_field . '_label'] = array(
         '#type' => 'textfield',
         '#title' => t($list_label . ' field Label'),
         '#default_value' => $list_label,
@@ -348,11 +354,10 @@ function worx_commerce_term_pricing_node_option_form() {
       );
       //Get list options and allow users to select availability
       $list_options = field_info_field($list_field)['settings']['allowed_values'];
-      $form[$list_field . '_options'] = array(
+      $form[$list_field][$list_field . '_options'] = array(
         '#type' => 'checkboxes',
         '#title' => t($list_label . ' Options'),
         '#options' => $list_options,
-        '#empty_option' => t('-None-'),
         '#default_value' => array(), //@TODO Set default value properly.
         '#description' => t('Select which options are available for this attribute on this product.'),
       );
@@ -361,11 +366,17 @@ function worx_commerce_term_pricing_node_option_form() {
 
   foreach ($term_fields as $term_field => $term_label) {
     if (array_key_exists($term_field, $set_lists)) {
-      $form[$term_field . '_required'] = array(
+      $form[$term_field] = array(
+        '#type' => 'fieldset',
+        '#title' => t($term_label),
+        '#collapsible' => TRUE, // Added
+        '#collapsed' => FALSE,  // Added
+      );
+      $form[$term_field][$term_field . '_required'] = array(
         '#type' => 'checkbox',
         '#title' => t($term_label . ' Field Required?.'),
       );
-      $form[$term_field . '_label'] = array(
+      $form[$term_field][$term_field . '_label'] = array(
         '#type' => 'textfield',
         '#title' => t($term_label . ' field Label'),
         '#default_value' => $term_label,
@@ -375,15 +386,34 @@ function worx_commerce_term_pricing_node_option_form() {
         '#required' => TRUE,
       );
     }
-
+    $term_options = array();
+    $term_vocab = taxonomy_vocabulary_machine_name_load(field_info_field($term_field)['settings']['allowed_values'][0]['vocabulary']);
+    $vocab_tree = taxonomy_get_tree($term_vocab->vid);
+    foreach ($vocab_tree as $term) {
+      $term_options[$term->tid] = $term->name;
+    }
+    $form[$term_field][$term_field . '_options'] = array(
+      '#type' => 'checkboxes',
+      '#title' => t($term_label . ' Options'),
+      '#options' => $term_options,
+      '#default_value' => array(), //@TODO Set default value properly.
+      '#description' => t('Select which options are available for this attribute on this product.'),
+    );
   }
+  
   foreach ($text_fields as $text_field => $text_label) {
     if (array_key_exists($text_field, $set_lists)) {
-      $form[$text_field . '_required'] = array(
+      $form[$text_field] = array(
+        '#type' => 'fieldset',
+        '#title' => t($text_label),
+        '#collapsible' => TRUE, // Added
+        '#collapsed' => FALSE,  // Added
+      );
+      $form[$text_field][$text_field . '_required'] = array(
         '#type' => 'checkbox',
         '#title' => t($text_label . ' Field Required?.'),
       );
-      $form[$text_field . '_label'] = array(
+      $form[$text_field][$text_field . '_label'] = array(
         '#type' => 'textfield',
         '#title' => t($text_label . ' field Label'),
         '#default_value' => $text_label,
@@ -393,15 +423,21 @@ function worx_commerce_term_pricing_node_option_form() {
         '#required' => TRUE,
       );
     }
-
   }
+  
   foreach ($image_fields as $image_field => $image_label) {
     if (array_key_exists($image_field, $set_lists)) {
-      $form[$image_field . '_required'] = array(
+      $form[$image_field] = array(
+        '#type' => 'fieldset',
+        '#title' => t($image_label),
+        '#collapsible' => TRUE, // Added
+        '#collapsed' => FALSE,  // Added
+      );
+      $form[$image_field][$image_field . '_required'] = array(
         '#type' => 'checkbox',
         '#title' => t($image_label . ' Field Required?.'),
       );
-      $form[$image_field . '_label'] = array(
+      $form[$image_field][$image_field . '_label'] = array(
         '#type' => 'textfield',
         '#title' => t($image_label . ' field Label'),
         '#default_value' => $image_label,
@@ -410,83 +446,16 @@ function worx_commerce_term_pricing_node_option_form() {
         '#maxlength' => 128,
         '#required' => TRUE,
       );
+      $form[$image_field][$image_field . '_max'] = array(
+        '#type' => 'select',
+        '#title' => t('Maximum Number of Images'),
+        '#options' => range(0, 1),
+        '#empty_option' => t('-none-'),
+        '#required' => FALSE,
+        '#default_value' => array(), //@TODO Properly set this default value.
+      );
     }
   }
-
-  //dsm($possible_fields);
-
-  /**
-  $flavor = taxonomy_vocabulary_machine_name_load('product_flavor');
-  $fl_terms = entity_load('taxonomy_term', FALSE, array('vid' => $flavor->vid));
-  $strength = taxonomy_vocabulary_machine_name_load('product_strength');
-  $st_terms = entity_load('taxonomy_term', FALSE, array('vid' => $strength->vid));
-  $pgvg = taxonomy_vocabulary_machine_name_load('product_pg_vg');
-  $pgvg_terms = entity_load('taxonomy_term', FALSE, array('vid' => $pgvg->vid));
-  $flavor_options = $strength_options = $pgvg_options = array();
-
-  foreach ($fl_terms as $flt_obj) {
-    $flavor_options[$flt_obj->tid] = $flt_obj->name;
-  }
-  foreach ($st_terms as $str_obj) {
-    $strength_options[$str_obj->tid] = $str_obj->name;
-  }
-  foreach ($pgvg_terms as $pgvg_obj) {
-    $pgvg_options[$pgvg_obj->tid] = $pgvg_obj->name;
-  }
-
-  isset($options['flavors']) ? $set_flavors = $options['flavors'] : $set_flavors = array();
-  isset($options['strength']) ? $set_strength = $options['strength'] : $set_strength = array();
-  isset($options['pgvg']) ? $set_pgvg = $options['pgvg'] : $set_pgvg = array();
-
-
-  // @TODO: This is hardcoded. Needs to be dynamic.
-  $taxonomies = array(
-    'product_flavor' => 'Flavors',
-    'product_strength' => 'Strength',
-    'product_pg_vg' => 'PG/VG',
-  );
-
-  $form['my_node'] = array(
-    '#markup' => "Set option lists for $node_title",
-  );
-  $form['active_lists'] = array(
-    '#type' => 'checkboxes',
-    '#title' => t('Available Attributes for this Product'),
-    '#description' => t('Select if an attribute is available when adding a product to the cart.'),
-    '#options' => $taxonomies,
-    '#empty_option' => t('-None-'),
-    '#default_value' => $set_lists,
-    '#prefix' => '<table><tr>',
-    '#suffix' => '</tr>',
-  );
-  $form['flavor'] = array(
-    '#type' => 'checkboxes',
-    '#title' => t('Flavor'),
-    '#options' => $flavor_options,
-    '#empty_option' => t('-None-'),
-    '#default_value' => $set_flavors,
-    '#prefix' => '<tr><td>',
-    '#suffix' => '</td>',
-  );
-  $form['strength'] = array(
-    '#type' => 'checkboxes',
-    '#title' => t('Strength'),
-    '#options' => $strength_options,
-    '#empty_option' => t('-None-'),
-    '#default_value' => $set_strength,
-    '#prefix' => '<td>',
-    '#suffix' => '</td>',
-  );
-  $form['pgvg'] = array(
-    '#type' => 'checkboxes',
-    '#title' => t('PG/VG Ratio'),
-    '#options' => $pgvg_options,
-    '#empty_option' => t('-None-'),
-    '#default_value' => $set_pgvg,
-    '#prefix' => '<td>',
-    '#suffix' => '</td></tr></table>',
-  );
-   */
 
   $form['#validate'][] = 'worx_commerce_term_pricing_options_validate';
   $form['submit'] = array(
@@ -515,16 +484,15 @@ function worx_commerce_term_pricing_options_validate($form, $form_state) {
     form_set_error('pgvg', 'PG/VG cannot be be enabled as an attribute without any options enabled.');
   }
    */
-
-
 }
 
 function worx_commerce_term_pricing_node_option_form_submit($form, &$form_state) {
   $values = $form_state['values'];
   $nid = $values['nid'];
   $lists = array_filter($values['available_fields']);
-  unset($values['submit'], $values['form_build_id'], $values['form_token'], $values['form_id'], $values['op']);
-  dsm($form_state['values']);
+  unset($values['submit'], $values['form_build_id'], $values['form_token'],
+    $values['form_id'], $values['op'], $values['nid'],
+    $values['available_fields']);
 
   $exists = db_select('commerce_term_pricing_node_options', 'ctpno')
     ->fields('ctpno')
@@ -538,17 +506,12 @@ function worx_commerce_term_pricing_node_option_form_submit($form, &$form_state)
       'available_fields' => $lists,
     ),
   );
-
-  // @todo: a foreach loop adding to the fields to $record['options_data'] array
-
-  /**
-    'flavors' => $flavors,
-    'strength' => $strength,
-    'pgvg' => $pgvg,
-  $flavors = array_filter($form_state['values']['flavor']);
-  $strength = array_filter($form_state['values']['strength']);
-  $pgvg = array_filter($form_state['values']['pgvg']);
-   */
+  
+  foreach ($values as $field_name => $field_option_values) {
+    foreach ($field_option_values as $option => $values) {
+      $record['options_data'][$option] = $values;
+    }
+  }
 
   if (!empty($exists)) {
     drupal_write_record('commerce_term_pricing_node_options', $record, 'nid');
