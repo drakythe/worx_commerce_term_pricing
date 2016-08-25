@@ -346,6 +346,16 @@ function worx_commerce_term_pricing_node_option_form() {
         '#maxlength' => 128,
         '#required' => TRUE,
       );
+      //Get list options and allow users to select availability
+      $list_options = field_info_field($list_field)['settings']['allowed_values'];
+      $form[$list_field . '_options'] = array(
+        '#type' => 'checkboxes',
+        '#title' => t($list_label . ' Options'),
+        '#options' => $list_options,
+        '#empty_option' => t('-None-'),
+        '#default_value' => array(), //@TODO Set default value properly.
+        '#description' => t('Select which options are available for this attribute on this product.'),
+      );
     }
   }
 
