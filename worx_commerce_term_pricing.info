@@ -1,6 +1,6 @@
 name = Worx Commerce Term Pricing
 description = A Module to adjust the price of products based on line item terms without needing to set up a rule for each scenario
 core = 7.x
-version = 7.x-1.0-alpha
+version = 7.x-2.0-alpha
 
 stylesheets[all][] = worx_commerce_term_pricing.css
