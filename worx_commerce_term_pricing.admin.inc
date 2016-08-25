@@ -286,16 +286,16 @@ function worx_commerce_term_pricing_node_option_form() {
 
       switch ($properties['display']['default']['type']) {
         case 'list_default':
-          $list_fields[] = $field;
+          $list_fields[$field] = $properties['label'];
           break;
         case 'taxonomy_term_reference_link':
-          $term_fields[] = $field;
+          $term_fields[$field] = $properties['label'];
           break;
         case 'text_default':
-          $text_fields[] = $field;
+          $text_fields[$field] = $properties['label'];
           break;
         case 'image':
-          $image_fields[] = $field;
+          $image_fields[$field] = $properties['label'];
           break;
       }
     }
@@ -309,6 +309,7 @@ function worx_commerce_term_pricing_node_option_form() {
   isset($options['available_fields']) ? $set_lists = $options['available_fields'] : $set_lists = array();
 
   // Now that we have all the pieces we actually create the form!
+  // Need the nid for saving into the DB.
   $form['nid'] = array(
     '#type' => 'textfield',
     '#title' => t('Node'),
@@ -318,6 +319,7 @@ function worx_commerce_term_pricing_node_option_form() {
     '#required' => TRUE,
     '#access' => FALSE,
   );
+  // Allow the user to select which attributes are available whne adding to cart
   $form['available_fields'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Available Attribute Fields'),
@@ -326,6 +328,80 @@ function worx_commerce_term_pricing_node_option_form() {
     '#empty_option' => t('-None-'),
     '#default_value' => $set_lists,
   );
+
+  // Each field type has specific fields, so we loop through the active ones
+  // and create them.
+  foreach ($list_fields as $list_field => $list_label) {
+    if (array_key_exists($list_field, $set_lists)) {
+      $form[$list_field . '_required'] = array(
+        '#type' => 'checkbox',
+        '#title' => t($list_label . ' Field Required?.'),
+      );
+      $form[$list_field . '_label'] = array(
+        '#type' => 'textfield',
+        '#title' => t($list_label . ' field Label'),
+        '#default_value' => $list_label,
+        '#description' => t('Change the field label if desired.'),
+        '#size' => 60,
+        '#maxlength' => 128,
+        '#required' => TRUE,
+      );
+    }
+  }
+
+  foreach ($term_fields as $term_field => $term_label) {
+    if (array_key_exists($term_field, $set_lists)) {
+      $form[$term_field . '_required'] = array(
+        '#type' => 'checkbox',
+        '#title' => t($term_label . ' Field Required?.'),
+      );
+      $form[$term_field . '_label'] = array(
+        '#type' => 'textfield',
+        '#title' => t($term_label . ' field Label'),
+        '#default_value' => $term_label,
+        '#description' => t('Change the field label if desired.'),
+        '#size' => 60,
+        '#maxlength' => 128,
+        '#required' => TRUE,
+      );
+    }
+
+  }
+  foreach ($text_fields as $text_field => $text_label) {
+    if (array_key_exists($text_field, $set_lists)) {
+      $form[$text_field . '_required'] = array(
+        '#type' => 'checkbox',
+        '#title' => t($text_label . ' Field Required?.'),
+      );
+      $form[$text_field . '_label'] = array(
+        '#type' => 'textfield',
+        '#title' => t($text_label . ' field Label'),
+        '#default_value' => $text_label,
+        '#description' => t('Change the field label if desired.'),
+        '#size' => 60,
+        '#maxlength' => 128,
+        '#required' => TRUE,
+      );
+    }
+
+  }
+  foreach ($image_fields as $image_field => $image_label) {
+    if (array_key_exists($image_field, $set_lists)) {
+      $form[$image_field . '_required'] = array(
+        '#type' => 'checkbox',
+        '#title' => t($image_label . ' Field Required?.'),
+      );
+      $form[$image_field . '_label'] = array(
+        '#type' => 'textfield',
+        '#title' => t($image_label . ' field Label'),
+        '#default_value' => $image_label,
+        '#description' => t('Change the field label if desired.'),
+        '#size' => 60,
+        '#maxlength' => 128,
+        '#required' => TRUE,
+      );
+    }
+  }
 
   //dsm($possible_fields);
 
