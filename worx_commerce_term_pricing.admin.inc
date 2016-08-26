@@ -385,20 +385,20 @@ function worx_commerce_term_pricing_node_option_form() {
         '#maxlength' => 128,
         '#required' => TRUE,
       );
+      $term_options = array();
+      $term_vocab = taxonomy_vocabulary_machine_name_load(field_info_field($term_field)['settings']['allowed_values'][0]['vocabulary']);
+      $vocab_tree = taxonomy_get_tree($term_vocab->vid);
+      foreach ($vocab_tree as $term) {
+        $term_options[$term->tid] = $term->name;
+      }
+      $form[$term_field][$term_field . '_options'] = array(
+        '#type' => 'checkboxes',
+        '#title' => t($term_label . ' Options'),
+        '#options' => $term_options,
+        '#default_value' => array(), //@TODO Set default value properly.
+        '#description' => t('Select which options are available for this attribute on this product.'),
+      );
     }
-    $term_options = array();
-    $term_vocab = taxonomy_vocabulary_machine_name_load(field_info_field($term_field)['settings']['allowed_values'][0]['vocabulary']);
-    $vocab_tree = taxonomy_get_tree($term_vocab->vid);
-    foreach ($vocab_tree as $term) {
-      $term_options[$term->tid] = $term->name;
-    }
-    $form[$term_field][$term_field . '_options'] = array(
-      '#type' => 'checkboxes',
-      '#title' => t($term_label . ' Options'),
-      '#options' => $term_options,
-      '#default_value' => array(), //@TODO Set default value properly.
-      '#description' => t('Select which options are available for this attribute on this product.'),
-    );
   }
   
   foreach ($text_fields as $text_field => $text_label) {
