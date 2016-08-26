@@ -342,11 +342,12 @@ function worx_commerce_term_pricing_node_option_form() {
       $form[$list_field][$list_field . '_required'] = array(
         '#type' => 'checkbox',
         '#title' => t($list_label . ' Field Required?.'),
+        '#default_value' => isset($defaults[$list_field . '_required']) ? $defaults[$list_field . '_required'] : FALSE,
       );
       $form[$list_field][$list_field . '_label'] = array(
         '#type' => 'textfield',
         '#title' => t($list_label . ' field Label'),
-        '#default_value' => $list_label,
+        '#default_value' => isset($defaults[$list_field . '_label']) ? $defaults[$list_field . '_label'] : $list_label,
         '#description' => t('Change the field label if desired.'),
         '#size' => 60,
         '#maxlength' => 128,
@@ -358,7 +359,7 @@ function worx_commerce_term_pricing_node_option_form() {
         '#type' => 'checkboxes',
         '#title' => t($list_label . ' Options'),
         '#options' => $list_options,
-        '#default_value' => array(), //@TODO Set default value properly.
+        '#default_value' => isset($defaults[$list_field . '_options']) ? $defaults[$list_field . '_options'] : array(),
         '#description' => t('Select which options are available for this attribute on this product.'),
       );
     }
@@ -375,11 +376,12 @@ function worx_commerce_term_pricing_node_option_form() {
       $form[$term_field][$term_field . '_required'] = array(
         '#type' => 'checkbox',
         '#title' => t($term_label . ' Field Required?.'),
+        '#default_value' => isset($defaults[$term_field . '_required']) ? $defaults[$term_field . '_required'] : FALSE,
       );
       $form[$term_field][$term_field . '_label'] = array(
         '#type' => 'textfield',
         '#title' => t($term_label . ' field Label'),
-        '#default_value' => $term_label,
+        '#default_value' => isset($defaults[$term_field . '_label']) ? $defaults[$term_field . '_label'] : $term_label,
         '#description' => t('Change the field label if desired.'),
         '#size' => 60,
         '#maxlength' => 128,
@@ -395,7 +397,7 @@ function worx_commerce_term_pricing_node_option_form() {
         '#type' => 'checkboxes',
         '#title' => t($term_label . ' Options'),
         '#options' => $term_options,
-        '#default_value' => array(), //@TODO Set default value properly.
+        '#default_value' => isset($defaults[$term_field . '_options']) ? $defaults[$term_field . '_options'] : array(),
         '#description' => t('Select which options are available for this attribute on this product.'),
       );
     }
@@ -412,11 +414,12 @@ function worx_commerce_term_pricing_node_option_form() {
       $form[$text_field][$text_field . '_required'] = array(
         '#type' => 'checkbox',
         '#title' => t($text_label . ' Field Required?.'),
+        '#default_value' => isset($defaults[$text_field . '_required']) ? $defaults[$text_field . '_required'] : FALSE,
       );
       $form[$text_field][$text_field . '_label'] = array(
         '#type' => 'textfield',
         '#title' => t($text_label . ' field Label'),
-        '#default_value' => $text_label,
+        '#default_value' => isset($defaults[$text_field . '_label']) ? $defaults[$text_field . '_label'] : $text_label,
         '#description' => t('Change the field label if desired.'),
         '#size' => 60,
         '#maxlength' => 128,
@@ -436,11 +439,12 @@ function worx_commerce_term_pricing_node_option_form() {
       $form[$image_field][$image_field . '_required'] = array(
         '#type' => 'checkbox',
         '#title' => t($image_label . ' Field Required?.'),
+        '#default_value' => isset($defaults[$image_field . '_required']) ? $defaults[$image_field . '_required'] : FALSE,
       );
       $form[$image_field][$image_field . '_label'] = array(
         '#type' => 'textfield',
         '#title' => t($image_label . ' field Label'),
-        '#default_value' => $image_label,
+        '#default_value' => isset($defaults[$image_field . '_label']) ? $defaults[$image_field . '_label'] : $image_label,
         '#description' => t('Change the field label if desired.'),
         '#size' => 60,
         '#maxlength' => 128,
@@ -452,7 +456,7 @@ function worx_commerce_term_pricing_node_option_form() {
         '#options' => range(0, 1),
         '#empty_option' => t('-none-'),
         '#required' => FALSE,
-        '#default_value' => array(), //@TODO Properly set this default value.
+        '#default_value' => isset($defaults[$image_field . '_max']) ? $defaults[$image_field . '_max'] : array(),
       );
     }
   }
