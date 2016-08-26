@@ -512,9 +512,7 @@ function worx_commerce_term_pricing_node_option_form_submit($form, &$form_state)
   );
   
   foreach ($values as $field_name => $field_option_values) {
-    foreach ($field_option_values as $option => $values) {
-      $record['options_data'][$option] = $values;
-    }
+    $record['options_data'][$field_name] = $field_option_values;
   }
 
   if (!empty($exists)) {
