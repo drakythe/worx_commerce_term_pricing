@@ -471,23 +471,6 @@ function worx_commerce_term_pricing_node_option_form() {
 }
 
 function worx_commerce_term_pricing_options_validate($form, $form_state) {
-  $lists = array_filter($form_state['values']['available_fields']);
-
-  //@TODO: This hardcoded bit needs to be dynamic
-  /**
-  $flavors = array_filter($form_state['values']['flavor']);
-  $strength = array_filter($form_state['values']['strength']);
-  $pgvg = array_filter($form_state['values']['pgvg']);
-  if (isset($lists['product_flavor']) && empty($flavors)) {
-    form_set_error('flavor', 'Flavor cannot be be enabled as an attribute without any options enabled.');
-  }
-  if (isset($lists['product_strength']) && empty($strength)) {
-    form_set_error('strength', 'Strength cannot be be enabled as an attribute without any options enabled.');
-  }
-  if (isset($lists['product_pg_vg']) && empty($pgvg)) {
-    form_set_error('pgvg', 'PG/VG cannot be be enabled as an attribute without any options enabled.');
-  }
-   */
 }
 
 function worx_commerce_term_pricing_node_option_form_submit($form, &$form_state) {
