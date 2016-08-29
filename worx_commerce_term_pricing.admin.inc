@@ -264,6 +264,7 @@ function worx_commerce_term_pricing_node_option_form() {
     // Setup filter arrays.
     $no_options = array(
       'commerce_display_path',
+      'field_number_of_images',
     );
     $optionable_types = array(
       'list_default',
@@ -305,8 +306,8 @@ function worx_commerce_term_pricing_node_option_form() {
     ->condition('nid', $nid)
     ->execute()
     ->fetchAssoc();
-  $options = unserialize($defaults['options_data']);
-  isset($options['available_fields']) ? $set_lists = $options['available_fields'] : $set_lists = array();
+  $defaults = unserialize($defaults['options_data']);
+  isset($defaults['available_fields']) ? $set_lists = $defaults['available_fields'] : $set_lists = array();
 
   // Now that we have all the pieces we actually create the form!
   // Need the nid for saving into the DB.
@@ -335,9 +336,9 @@ function worx_commerce_term_pricing_node_option_form() {
     if (array_key_exists($list_field, $set_lists)) {
       $form[$list_field] = array(
         '#type' => 'fieldset',
-        '#title' => t($list_label),
+        '#title' => t($list_label . ' Setting'),
         '#collapsible' => TRUE, // Added
-        '#collapsed' => FALSE,  // Added
+        '#collapsed' => TRUE,  // Added
       );
       $form[$list_field][$list_field . '_required'] = array(
         '#type' => 'checkbox',
@@ -369,9 +370,9 @@ function worx_commerce_term_pricing_node_option_form() {
     if (array_key_exists($term_field, $set_lists)) {
       $form[$term_field] = array(
         '#type' => 'fieldset',
-        '#title' => t($term_label),
+        '#title' => t($term_label . ' Setting'),
         '#collapsible' => TRUE, // Added
-        '#collapsed' => FALSE,  // Added
+        '#collapsed' => TRUE,  // Added
       );
       $form[$term_field][$term_field . '_required'] = array(
         '#type' => 'checkbox',
@@ -407,9 +408,9 @@ function worx_commerce_term_pricing_node_option_form() {
     if (array_key_exists($text_field, $set_lists)) {
       $form[$text_field] = array(
         '#type' => 'fieldset',
-        '#title' => t($text_label),
+        '#title' => t($text_label . ' Setting'),
         '#collapsible' => TRUE, // Added
-        '#collapsed' => FALSE,  // Added
+        '#collapsed' => TRUE,  // Added
       );
       $form[$text_field][$text_field . '_required'] = array(
         '#type' => 'checkbox',
@@ -432,9 +433,9 @@ function worx_commerce_term_pricing_node_option_form() {
     if (array_key_exists($image_field, $set_lists)) {
       $form[$image_field] = array(
         '#type' => 'fieldset',
-        '#title' => t($image_label),
+        '#title' => t($image_label . ' Setting'),
         '#collapsible' => TRUE, // Added
-        '#collapsed' => FALSE,  // Added
+        '#collapsed' => TRUE,  // Added
       );
       $form[$image_field][$image_field . '_required'] = array(
         '#type' => 'checkbox',
