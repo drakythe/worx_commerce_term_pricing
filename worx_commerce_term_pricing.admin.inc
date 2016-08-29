@@ -190,7 +190,8 @@ function worx_commerce_term_pricing_get_rules() {
 
 function worx_commerce_term_pricing_options_form() {
   $form = $node_options = $saved_options = array();
-  $nodes = node_load_multiple(array(), array('type' => 'bulk_product_display'));
+  // @TODO: Make 'product_display' a variable that can be configured.
+  $nodes = node_load_multiple(array(), array('type' => 'product_display'));
   foreach ($nodes as $node) {
     $node_options[$node->nid] = $node->title;
   }
