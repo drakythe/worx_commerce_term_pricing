@@ -144,7 +144,7 @@ function worx_commerce_term_pricing_settings_form_submit($form, &$form_state) {
 function worx_commerce_term_pricing_get_rules() {
   $header = array(
     array('data' => 'Product', 'field' => 'product_sku', 'sort' => 'ASC'),
-    array('data' => 'Flavor', 'field' => 'flavor_tid', 'sort' => 'ASC'),
+    array('data' => 'Flavor', 'field' => 'attribute', 'sort' => 'ASC'),
     array('data' => 'Change', 'field' => 'price_change', 'sort' => 'ASC'),
     array('data' => 'Change Type', 'field' => 'change_type'),
     array('data' => 'Delete', 'field' => 'tprid'),
@@ -154,8 +154,8 @@ function worx_commerce_term_pricing_get_rules() {
     ->extend('PagerDefault')
     ->extend('TableSort');
 
-  $select->fields('ctpr', array('tprid', 'product_sku', 'flavor_tid', 'price_change', 'change_type'))
-    ->limit(10)
+  $select->fields('ctpr', array('tprid', 'product_sku', 'attribute', 'price_change', 'change_type'))
+    ->limit(25)
     ->orderByHeader($header);
 
   $results = $select->execute();
@@ -170,12 +170,12 @@ function worx_commerce_term_pricing_get_rules() {
     else {
       $title = 'N/A';
     }
-    $flavor_term = taxonomy_term_load($row->flavor_tid);
-    $flavor_name = $flavor_term->name;
+    $attribute_term = taxonomy_term_load($row->attribute);
+    $attribute_name = $attribute_term->name;
 
     $rows[] = array(
       $title,
-      $flavor_name,
+      $attribute_name,
       $row->price_change,
       $row->change_type, 
       l('Delete', 'admin/commerce/term_pricing/rule/' . $row->tprid . '/delete', array('query' => array('destination' => '/admin/commerce/term_pricing')))
