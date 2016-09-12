@@ -6,17 +6,18 @@
 function worx_commerce_term_pricing_menu() {
   $items = array();
 
-  $items['admin/commerce/term_pricing'] = array(
+  $items['node/%node/term_pricing'] = array(
     'title' => 'Term Pricing Settings',
     'description' => 'Review and add new term pricing',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('worx_commerce_term_pricing_settings_form'),
-    'access arguments' => array('worx_commerce_term_pricing_admin'),
+    'page arguments' => array('worx_commerce_term_pricing_settings_form', 1),
+    'access callback' => 'worx_commerce_term_pricing_access',
+    'access arguments' => array(1),
     'file' => 'worx_commerce_term_pricing.admin.inc',
     'file path' => drupal_get_path('module', 'worx_commerce_term_pricing'),
-    'type' => MENU_NORMAL_ITEM,
+    'type' => MENU_LOCAL_TASK,
   );
-  $items['admin/commerce/term_pricing/view'] = array(
+  $items['node/%node/term_pricing/rule'] = array(
     'title' => 'Term Pricing',
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
@@ -28,17 +29,18 @@ function worx_commerce_term_pricing_menu() {
     'access arguments' => array('worx_commerce_term_pricing_admin'),
     'file' => 'worx_commerce_term_pricing.admin.inc',
     'file path' => drupal_get_path('module', 'worx_commerce_term_pricing'),
-    'type' => MENU_LOCAL_TASK,
+    'type' => MENU_NORMAL_ITEM,
   );
-  $items['admin/commerce/term_pricing/options/%'] = array(
+  $items['node/%node/term_pricing/options'] = array(
     'title' => 'Create/edit Option Sets',
     'description' => 'Edit or add Bulk Flavor Display Option for Node',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('worx_commerce_term_pricing_node_option_form'),
-    'access arguments' => array('worx_commerce_term_pricing_admin'),
+    'page arguments' => array('worx_commerce_term_pricing_node_option_form', 1),
+    'access callback' => 'worx_commerce_term_pricing_access',
+    'access arguments' => array(1),
     'file' => 'worx_commerce_term_pricing.admin.inc',
     'file path' => drupal_get_path('module', 'worx_commerce_term_pricing'),
-    'type' => MENU_NORMAL_ITEM,
+    'type' => MENU_LOCAL_TASK,
   );
   $items['admin/commerce/term_pricing/rule/%/delete'] = array(
     'title' => 'Delete Term Pricing Rule',
@@ -74,6 +76,11 @@ function worx_commerce_term_pricing_permission() {
   return $return;
 }
 
+function worx_commerce_term_pricing_access ($node) {
+  $is_display = in_array($node->type, array_keys(commerce_product_reference_node_types()));
+  return $is_display && user_access('worx_commerce_term_pricing_admin');
+}
+
 /**
  * Implements hook_action_info().
  */
@@ -104,11 +111,16 @@ function worx_commerce_term_pricing_rules_action_info() {
 /**
  * @param $line_item
  *  Commerce Line Item Object
- * @return float
+ * @return array
  */
 function worx_commerce_term_pricing_calculate_price($line_item) {
   $product = commerce_product_load_by_sku($line_item->line_item_label);
   $base_price = $product->commerce_price[LANGUAGE_NONE][0]['amount'];
+  dsm($base_price);
+  if (!empty($product->commerce_price['und'][0]['data']['components'])) {
+    //dsm($product);
+  }
+  $calculated_price = $base_price;
   // If the product in question has not been added to a cart, bail out.
   /**
   if (!isset($line_item->line_item_id) || !isset($line_item->field_bulk_flavor[LANGUAGE_NONE][0]['tid'])) {
@@ -116,49 +128,52 @@ function worx_commerce_term_pricing_calculate_price($line_item) {
       'calculated_price' => $base_price,
     );
   }
-  */
   // @TODO: Need to make this dynamic. along with the rest.
   $flavor = $line_item->field_bulk_flavor[LANGUAGE_NONE][0]['tid'];
+   */
 
   // First we see if a rule matches both the flavor & SKU
   $query = db_select('commerce_term_pricing_rules', 'ctpr')
     ->fields('ctpr')
     ->condition('product_sku', $line_item->line_item_label)
-    ->condition('flavor_tid', $flavor)
-    ->execute()
-    ->fetchAssoc();
+    ->execute();
 
-  // If we have not found a rule which applies to both flavor and sku, check for
-  // one which applies just to the flavor.
-  if (!is_array($query)) {
-    $query = db_select('commerce_term_pricing_rules', 'ctpr')
-      ->fields('ctpr')
-      ->condition('flavor_tid', $flavor)
-      ->execute()
-      ->fetchAssoc();
-  }
-  // Check one to see if we got a rule, if not just return the product's base
-  // price.
-  if (!is_array($query)) {
-    return array(
-      'calculated_price' => $base_price,
-    );
-  }
+  while ($result = $query->fetchAssoc()) {
 
-  // Assuming we found a rule which applies to this product, calculate the new
-  // price and return it.
-  $change = $query['price_change'];
-  $type = $query['change_type'];
+    // Check one to see if we got a rule, if not just return the product's base
+    // price.
+    if (!is_array($result)) {
+      return array(
+        'calculated_price' => $base_price,
+      );
+    }
+    $settings = unserialize($result['attributes']);
+    foreach ($settings as $property => $value) {
+      if (isset($line_item->{$property}[LANGUAGE_NONE])) {
+        $keys = array_keys($line_item->{$property}[LANGUAGE_NONE][0]);
+        if ($line_item->{$property}[LANGUAGE_NONE][0][$keys[0]] == $value) {
+          // Assuming we found a rule which applies to this product, calculate the new
+          // price and return it.
+          $change = $result['price_change'];
+          $type = $result['change_type'];
 
-  // If the change is a flat change, simple add the two values together
-  // after converting the change to minor units. Otherwise determine % value
-  // and multiply by the change value, rounding to account for decimal %s.
-  if ($type == 'flat') {
-    $change = (int) ($change * 100); // convert to minor units, discard any extra decimal places;
-    $calculated_price = $base_price + $change;
-  }
-  else {
-    $calculated_price = round($base_price + (($base_price/100) * $change));
+          // If the change is a flat change, simple add the two values together
+          // after converting the change to minor units. Otherwise determine % value
+          // and multiply by the change value, rounding to account for decimal %s.
+          if ($type == 'flat') {
+            $change = (int) ($change * 100); // convert to minor units, discard any extra decimal places;
+            dsm("Flat Increase");
+            dsm($product);
+            $calculated_price = $calculated_price + $change;
+          }
+          else {
+            dsm("% Increase");
+            dsm($product);
+            $calculated_price = round($calculated_price + (($base_price / 100) * $change));
+          }
+        }
+      }
+    }
   }
 
   return array(
@@ -191,17 +206,17 @@ function worx_commerce_term_pricing_delete_option($nid) {
 }
 
 function worx_commerce_term_pricing_form_alter(&$form, &$form_state, $form_id) {
-  /**
   if (strpos($form_id, 'commerce_cart_add_to_cart_form') !== FALSE) {
-    $args = arg();
-    if (count($args) > 1) {
-      $nid = $args[1];
-      if (is_numeric($nid)) {
-        $form_state['worx_commerce_term_pricing_nid'] = $nid;
+    $node = menu_get_object();
+    // Don't like this but its because of the ajax call return
+    if (is_object($node)) {
+        $form_state['worx_commerce_term_pricing_nid'] = $node->nid;
       }
       else {
-        $nid = $form_state['worx_commerce_term_pricing_nid'];
+        $node = node_load($form_state['worx_commerce_term_pricing_nid']);
       }
+    if ($node->type == 'product_display') {
+      $nid = $node->nid;
 
       $exists = db_select('commerce_term_pricing_node_options', 'ctpno')
         ->fields('ctpno')
@@ -210,54 +225,28 @@ function worx_commerce_term_pricing_form_alter(&$form, &$form_state, $form_id) {
         ->fetchAssoc();
 
       if (!empty($exists)) {
-        $none_option = array('_none' => '- Select a value -');
         $options = unserialize($exists['options_data']);
-        //@TODO: Update this hardcoded option set.
-        // The options should be set on a per node basis. Perhaps in a new table
-        // which we can then lookup on this form alter, because we'll have the
-        // node. The table would be the nid and a serialized array of which
-        // options are enabled on it, then loop through those options and create
-        // variables to set the form field options.
-        $set_flavors = $none_option + $options['flavors'];
-        $set_strength = $none_option + $options['strength'];
-        $set_pgvg = $none_option + $options['pgvg'];
-
-        // Hide the fields until we determine they are available on this product.
-        // @Todo this would be contained in the above TODO loop.
-        $form['line_item_fields']['field_bulk_flavor']['#access'] = FALSE;
-        $form['line_item_fields']['field_bulk_strength']['#access'] = FALSE;
-        $form['line_item_fields']['field_bulk_pg_vg']['#access'] = FALSE;
-
-        // Check which fields are active for this node and enable/require them.
-        $lists = $options['active_lists'];
-        foreach ($lists as $attribute) {
-          // @TODO: This is hardcoded. Need to figure out how to dynamically
-          // loop through the above values and set the appropriate options below
-          switch ($attribute) {
-            case 'product_flavor':
-              $form['line_item_fields']['field_bulk_flavor']['#access'] = TRUE;
-              $form['line_item_fields']['field_bulk_flavor'][LANGUAGE_NONE]['#required'] = TRUE;
-              break;
-            case 'product_strength':
-              $form['line_item_fields']['field_bulk_strength']['#access'] = TRUE;
-              $form['line_item_fields']['field_bulk_strength'][LANGUAGE_NONE]['#required'] = TRUE;
-              break;
-            case 'product_pg_vg':
-              $form['line_item_fields']['field_bulk_pg_vg']['#access'] = TRUE;
-              $form['line_item_fields']['field_bulk_pg_vg'][LANGUAGE_NONE]['#required'] = TRUE;
-              break;
+        $available_fields = $options['available_fields'];
+        // First we turn off access to fields
+        foreach ($form['line_item_fields'] as $field => &$settings) {
+          if (is_array($settings) && isset($settings['#access'])) {
+            $settings['#access'] = FALSE;
           }
         }
+        // Now add access back for appropriate fields.
+        foreach ($available_fields as $available_field) {
+          //dsm('Field ' . $available_field . ' required status: ' . $options[$available_field . '_required'] . ' and the label is ' . $options[$available_field . '_label']);
+          $field_settings = &$form['line_item_fields'][$available_field];
+          $field_settings['#access'] = TRUE;
+          $field_settings[LANGUAGE_NONE]['#required'] = $options[$available_field . '_required'];
+          $field_settings[LANGUAGE_NONE]['#title'] = $options[$available_field . '_label'];
+          $field_settings[LANGUAGE_NONE][0]['#title'] = $options[$available_field . '_label'];
 
-        // @TODO: Again, this needs to be dynamic.
-        $flavors = &$form['line_item_fields']['field_bulk_flavor'][LANGUAGE_NONE]['#options'];
-        $strength = &$form['line_item_fields']['field_bulk_strength'][LANGUAGE_NONE]['#options'];
-        $pgvg = &$form['line_item_fields']['field_bulk_pg_vg'][LANGUAGE_NONE]['#options'];
-        $flavors = array_intersect_key($flavors, $set_flavors);
-        $strength = array_intersect_key($strength, $set_strength);
-        $pgvg = array_intersect_key($pgvg, $set_pgvg);
+          if (isset($field_settings[LANGUAGE_NONE]['#options'])) {
+            $field_settings[LANGUAGE_NONE]['#options'] = array_intersect_key($field_settings[LANGUAGE_NONE]['#options'], array_filter($options[$available_field . '_options']));
+          }
+        }
       }
     }
   }
-   */
 }

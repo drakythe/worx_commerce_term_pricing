@@ -9,33 +9,51 @@
  * For image upload field, a max number of images dropdown.
  */
 
-function worx_commerce_term_pricing_settings_form() {
-  // @TODO: Need to dynamically create an array of variables
-  $flavor_options = $strength_options = $pgvg_options = $bulk_products = array();
-  $flavor = taxonomy_vocabulary_machine_name_load('product_flavor');
-  $fl_terms = entity_load('taxonomy_term', FALSE, array('vid' => $flavor->vid));
+function worx_commerce_term_pricing_settings_form($form, &$form_state, $node) {
+  $term_options = $available_products = array();
+  // @TODO: This needs to be a var set somewhere.
+  $product_field = 'field_product_display_product';
 
-  foreach ($fl_terms as $flt_obj) {
-    $flavor_options[$flt_obj->tid] = $flt_obj->name;
+
+  $info = field_info_instances('node', $node->type);
+
+  $line_item_type = $info[$product_field]['display']['default']['settings']['line_item_type'];
+  $line_item_info = field_info_instances('commerce_line_item', $line_item_type);
+
+  foreach ($node->{$product_field}[LANGUAGE_NONE] as $delta => $pid) {
+    $product = commerce_product_load($pid['product_id']);
+    $available_products[$product->sku] = $product->title;
   }
-  $query = new EntityFieldQuery();
-  $query->entityCondition('entity_type', 'commerce_product')
-    ->entityCondition('bundle', 'term_priced')
-    ->propertyCondition('status', 1)
-    ->fieldOrderBy('commerce_price', 'amount', 'ASC')
-  ;
-  $result = $query->execute();
-  foreach ($result['commerce_product'] as $product_obj) {
-    $product = commerce_product_load($product_obj->product_id);
-    $bulk_products[$product->sku] = $product->title;
+  $available_options = db_select('commerce_term_pricing_node_options', 'ctpno')
+    ->fields('ctpno')
+    ->condition('nid', $node->nid)
+    ->execute()
+    ->fetchAssoc();
+  $available_options = unserialize($available_options['options_data']);
+  $field_options = array();
+  foreach ($available_options['available_fields'] as $field_id_key => $field_id) {
+    if (!isset($available_options[$field_id . '_options'])) {
+      continue;
+    }
+    $field_options[$field_id_key] = $field_id;
   }
 
-  $rules_table = worx_commerce_term_pricing_get_rules();
+  // Render a table of the existing rules
+  $rules_table = worx_commerce_term_pricing_get_rules($node->nid);
 
   $form['rules_table'] = array(
     '#markup' => $rules_table,
   );
-  $form['contact_information'] = array(
+  $form['nid'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Node'),
+    '#default_value' => $node->nid,
+    '#size' => 25,
+    '#maxlength' => 100,
+    '#required' => TRUE,
+    '#access' => FALSE,
+  );
+  $form['add_pricing_rule'] = array(
     '#markup' => t("Add New Pricing Rule"),
     '#prefix' => '<strong>',
     '#suffix' => '</strong>',
@@ -43,22 +61,58 @@ function worx_commerce_term_pricing_settings_form() {
   $form['product'] = array(
     '#type' => 'select',
     '#title' => t('Product'),
-    '#options' => $bulk_products,
-    '#empty_option' => t('-none-'),
-    '#required' => FALSE,
+    '#options' => $available_products,
+    '#required' => TRUE,
     '#default_value' => '',
     '#prefix' => '<table><tr><td>',
     '#suffix' => '</td>',
    );
-  $form['flavor'] = array(
+  $form['attribute_field'] = array(
     '#type' => 'select',
-    '#title' => t('Flavor'),
-    '#options' => $flavor_options,
+    '#title' => t('Field'),
+    '#options' => $field_options,
+    '#required' => TRUE,
     '#empty_option' => t('-None-'),
-    '#default_value' => '',
+    '#default_value' => array(),
     '#prefix' => '<td>',
     '#suffix' => '</td>',
-   );
+  );
+  foreach ($field_options as $field_id) {
+    $enabled_options = array_filter($available_options[$field_id . '_options']);
+
+    switch ($line_item_info[$field_id]['display']['default']['type']) {
+      case 'list_default':
+        $list_options = field_info_field($field_id)['settings']['allowed_values'];
+        $field_id_options = array_intersect_key($list_options, $enabled_options);
+        break;
+      case 'taxonomy_term_reference_link':
+        $term_options = array();
+        $term_vocab = taxonomy_vocabulary_machine_name_load(field_info_field($field_id)['settings']['allowed_values'][0]['vocabulary']);
+        $vocab_tree = taxonomy_get_tree($term_vocab->vid);
+        foreach ($vocab_tree as $term) {
+          $term_options[$term->tid] = $term->name;
+        }
+        $field_id_options = array_intersect_key($term_options, $enabled_options);
+        break;
+    }
+    $form[$field_id . '_attribute'] = array(
+      '#type' => 'select',
+      '#title' => t('Attribute'),
+      '#options' => $field_id_options,
+      '#empty_option' => t('-None-'),
+      '#default_value' => array(),
+      '#prefix' => '<td>',
+      '#suffix' => '</td>',
+      '#states' => array(
+        'visible' => array(
+          ':input[name="attribute_field"]' => array('value' => $field_id),
+        ),
+        'required' => array(
+          ':input[name="attribute_field"]' => array('value' => $field_id),
+        ),
+      ),
+    );
+  }
   $form['change'] = array(
     '#type' => 'textfield',
     '#title' => t('Price Change'),
@@ -100,40 +154,50 @@ function worx_commerce_term_pricing_rule_validate($form, &$form_state) {
 
   $valid = FALSE;
 
-  if (!empty($values['flavor'])) {
+  $attribute_set = $values['attribute_field'];
+
+  if (!empty($values[$attribute_set . '_attribute'])) {
     $valid = TRUE;
   }
-  // @TODO: We won't be using these rules to begin with, but may enable them
-  // later.
-  /**
-  else if (!empty($values['strength'])) {
-    $valid = TRUE;
-  }
-  else if (!empty($values['pgvg'])) {
-    $valid = TRUE;
-  }
-   */
 
   if (!$valid) {
-    form_set_error('', 'Please select an attribute to apply this pricing rule to.');
+    form_set_error($attribute_set . '_attribute', 'Please select an attribute to apply this pricing rule to.');
   }
 }
 
 function worx_commerce_term_pricing_settings_form_submit($form, &$form_state) {
   $values = $form_state['values'];
   $record = array();
+  $update = FALSE;
+  $attribute_field = $values['attribute_field'];
 
-  // @TODO: We won't be using these rules to begin with, but may enable them
-  // later.
-  //$record['strength_tid'] = $values['strength'];
-  //$record['pgvg_tid'] = $values['pgvg'];
 
   $record['product_sku'] = $values['product'];
-  $record['flavor_tid'] = $values['flavor'];
   $record['price_change'] = $values['change'];
+  $record['attributes'][$attribute_field] = $values[$attribute_field . '_attribute'];
   $record['change_type'] = $values['change_type'];
+  $record['nid'] = $values['nid'];
 
-  $write = drupal_write_record('commerce_term_pricing_rules', $record);
+  $query = db_select('commerce_term_pricing_rules', 'ctpr')
+    ->fields('ctpr')
+    ->condition('product_sku', $values['product'])
+    ->execute();
+
+  while ($result = $query->fetchAssoc()) {
+    $attribute = unserialize($result['attributes']);
+    if ($attribute == $record['attributes']) {
+      $update = TRUE;
+      $record['tprid'] = $result['tprid'];
+      break;
+    }
+  }
+
+  if ($update) {
+    $write = drupal_write_record('commerce_term_pricing_rules', $record, 'tprid');
+  }
+  else {
+    $write = drupal_write_record('commerce_term_pricing_rules', $record);
+  }
 
   if ($write === FALSE) {
     drupal_set_message('Rule failed to write to Database, inform site Administrator', 'error');
@@ -141,10 +205,10 @@ function worx_commerce_term_pricing_settings_form_submit($form, &$form_state) {
   }
 }
 
-function worx_commerce_term_pricing_get_rules() {
+function worx_commerce_term_pricing_get_rules($nid) {
   $header = array(
     array('data' => 'Product', 'field' => 'product_sku', 'sort' => 'ASC'),
-    array('data' => 'Flavor', 'field' => 'attribute', 'sort' => 'ASC'),
+    array('data' => 'Attribute', 'field' => 'attributes', 'sort' => 'ASC'),
     array('data' => 'Change', 'field' => 'price_change', 'sort' => 'ASC'),
     array('data' => 'Change Type', 'field' => 'change_type'),
     array('data' => 'Delete', 'field' => 'tprid'),
@@ -154,7 +218,8 @@ function worx_commerce_term_pricing_get_rules() {
     ->extend('PagerDefault')
     ->extend('TableSort');
 
-  $select->fields('ctpr', array('tprid', 'product_sku', 'attribute', 'price_change', 'change_type'))
+  $select->fields('ctpr', array('tprid', 'product_sku', 'attributes', 'price_change', 'change_type'))
+    ->condition('nid', $nid)
     ->limit(25)
     ->orderByHeader($header);
 
@@ -170,15 +235,40 @@ function worx_commerce_term_pricing_get_rules() {
     else {
       $title = 'N/A';
     }
-    $attribute_term = taxonomy_term_load($row->attribute);
-    $attribute_name = $attribute_term->name;
+
+    $node = node_load($nid);
+    $attribute_name = '';
+    $attribute_array = unserialize($row->attributes);
+
+    $info = field_info_instances('node', $node->type);
+    //@TODO Set as var in future.
+    $product_field = 'field_product_display_product';
+    $line_item_type = $info[$product_field]['display']['default']['settings']['line_item_type'];
+    $line_item_info = field_info_instances('commerce_line_item', $line_item_type);
+    reset($attribute_array);
+    $field_id = key($attribute_array);
+    switch ($line_item_info[$field_id]['display']['default']['type']) {
+      case 'list_default':
+        $list_options = field_info_field($field_id)['settings']['allowed_values'];
+        $attribute_name = $list_options[$attribute_array[$field_id]];
+        break;
+      case 'taxonomy_term_reference_link':
+        $term_options = array();
+        $term_vocab = taxonomy_vocabulary_machine_name_load(field_info_field($field_id)['settings']['allowed_values'][0]['vocabulary']);
+        $vocab_tree = taxonomy_get_tree($term_vocab->vid);
+        foreach ($vocab_tree as $term) {
+          $term_options[$term->tid] = $term->name;
+        }
+        $attribute_name = $term_options[$attribute_array[$field_id]];
+        break;
+    }
 
     $rows[] = array(
       $title,
       $attribute_name,
       $row->price_change,
       $row->change_type, 
-      l('Delete', 'admin/commerce/term_pricing/rule/' . $row->tprid . '/delete', array('query' => array('destination' => '/admin/commerce/term_pricing')))
+      l('Delete', 'admin/commerce/term_pricing/rule/' . $row->tprid . '/delete', array('query' => array('destination' => '/node/' .$nid . '/term_pricing')))
     );
   }
 
@@ -247,18 +337,14 @@ function worx_commerce_term_pricing_options_create_table($unsaved_options, $save
   return $output;
 }
 
-function worx_commerce_term_pricing_node_option_form() {
+function worx_commerce_term_pricing_node_option_form($form, &$form_id, $node) {
   $form = $possible_fields = $list_fields = $term_fields = $text_fields = $image_fields = array();
-  $args = arg();
-  $nid = $args[4];
-  $node = node_load($nid);
-  $node_title = $node->title;
 
   // @TODO: This needs to be a var set somewhere.
   $product_field = 'field_product_display_product';
 
   $info = field_info_instances('node', $node->type);
-  $line_item_type = $info['field_product_display_product']['display']['default']['settings']['line_item_type'];
+  $line_item_type = $info[$product_field]['display']['default']['settings']['line_item_type'];
   $line_item_info = field_info_instances('commerce_line_item', $line_item_type);
 
   foreach ($line_item_info as $field => $properties) {
@@ -304,7 +390,7 @@ function worx_commerce_term_pricing_node_option_form() {
   }
   $defaults = db_select('commerce_term_pricing_node_options', 'ctpno')
     ->fields('ctpno')
-    ->condition('nid', $nid)
+    ->condition('nid', $node->nid)
     ->execute()
     ->fetchAssoc();
   $defaults = unserialize($defaults['options_data']);
@@ -315,7 +401,7 @@ function worx_commerce_term_pricing_node_option_form() {
   $form['nid'] = array(
     '#type' => 'textfield',
     '#title' => t('Node'),
-    '#default_value' => $nid,
+    '#default_value' => $node->nid,
     '#size' => 25,
     '#maxlength' => 100,
     '#required' => TRUE,

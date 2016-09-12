@@ -1,12 +1,8 @@
 <?php
-// @TODO: Probably just need to move on to version 2.0 and note there is no
-// upgrade path.
-
 
 function worx_commerce_term_pricing_schema() {
   $schema = array();
 
-  /**
   $schema['commerce_term_pricing_rules'] = array(
     'description' => 'Holds the term pricing rules',
     'fields' => array(
@@ -16,6 +12,13 @@ function worx_commerce_term_pricing_schema() {
         'unsigned' => TRUE,
         'not null' => TRUE,
       ),
+      'nid' => array(
+        'description' => 'The Node ID this rule was set for',
+        'type' => 'int',
+        'size' => 'normal',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
       'product_sku' => array(
         'description' => 'The SKU of the product this rule applies to',
         'type' => 'varchar',
@@ -23,26 +26,13 @@ function worx_commerce_term_pricing_schema() {
         'not null' => TRUE,
         'default' => '',
       ),
-      'flavor_tid' => array(
-        'description' => 'Term ID of the flavor this rule applies to',
-        'type' => 'int',
-        'size' => 'normal',
+      'attributes' => array(
+        'description' => 'The attribute this rule applies to',
+        'type' => 'text',
+        'size' => 'big',
         'not null' => TRUE,
-        'default' => 0,
-      ),
-      'strength_tid' => array(
-        'description' => 'Term ID of the strength this rule applies to',
-        'type' => 'int',
-        'size' => 'normal',
-        'not null' => TRUE,
-        'default' => 0,
-      ),
-      'pgvg_tid' => array(
-        'description' => 'Term ID of the pg/vg ratio this rule applies to',
-        'type' => 'int',
-        'size' => 'normal',
-        'not null' => TRUE,
-        'default' => 0,
+        'serialize' => TRUE,
+        'object default' => array(),
       ),
       'price_change' => array(
         'description' => 'The amount the price changes by',
@@ -62,7 +52,6 @@ function worx_commerce_term_pricing_schema() {
 
     'primary key' => array('tprid'),
   );
-   */
 
   $schema['commerce_term_pricing_node_options'] = array(
     'description' => 'Holds data about what options are available on a product display',
