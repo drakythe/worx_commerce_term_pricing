@@ -116,7 +116,6 @@ function worx_commerce_term_pricing_rules_action_info() {
 function worx_commerce_term_pricing_calculate_price($line_item) {
   $product = commerce_product_load_by_sku($line_item->line_item_label);
   $base_price = $product->commerce_price[LANGUAGE_NONE][0]['amount'];
-  dsm($base_price);
   if (!empty($product->commerce_price['und'][0]['data']['components'])) {
     //dsm($product);
   }
@@ -162,13 +161,9 @@ function worx_commerce_term_pricing_calculate_price($line_item) {
           // and multiply by the change value, rounding to account for decimal %s.
           if ($type == 'flat') {
             $change = (int) ($change * 100); // convert to minor units, discard any extra decimal places;
-            dsm("Flat Increase");
-            dsm($product);
             $calculated_price = $calculated_price + $change;
           }
           else {
-            dsm("% Increase");
-            dsm($product);
             $calculated_price = round($calculated_price + (($base_price / 100) * $change));
           }
         }
