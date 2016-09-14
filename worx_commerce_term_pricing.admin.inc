@@ -351,7 +351,6 @@ function worx_commerce_term_pricing_node_option_form($form, &$form_id, $node) {
     // Setup filter arrays.
     $no_options = array(
       'commerce_display_path',
-      'field_number_of_images',
     );
     $optionable_types = array(
       'list_default',
