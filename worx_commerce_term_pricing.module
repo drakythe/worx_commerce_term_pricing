@@ -241,7 +241,17 @@ function worx_commerce_term_pricing_form_alter(&$form, &$form_state, $form_id) {
             $field_settings[LANGUAGE_NONE]['#options'] = array_intersect_key($field_settings[LANGUAGE_NONE]['#options'], array_filter($options[$available_field . '_options']));
           }
         }
+        array_unshift($form['validate'], 'worx_commerce_term_pricing_image_validation');
       }
     }
+  }
+}
+
+function worx_Commerce_term_pricing_image_validation($form, &$form_state) {
+  $values = $form_state['value'];
+  if (isset($values['field_number_of_images'])) {
+    //@TODO: Count number of images uploaded and compare to number of images
+    // field setting. If not the same, return error.
+    form_set_error('', 'Test Error');
   }
 }
