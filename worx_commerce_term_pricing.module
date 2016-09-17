@@ -207,11 +207,20 @@ function worx_commerce_term_pricing_form_alter(&$form, &$form_state, $form_id) {
     if (is_object($node)) {
         $form_state['worx_commerce_term_pricing_nid'] = $node->nid;
       }
-      else {
-        $node = node_load($form_state['worx_commerce_term_pricing_nid']);
-      }
-    if ($node->type == 'product_display') {
+    else if (isset($form_state['worx_commerce_term_pricing_nid'])) {
+      $node = node_load($form_state['worx_commerce_term_pricing_nid']);
+    }
+    if (is_object($node) && $node->type == 'product_display') {
       $nid = $node->nid;
+
+      //Upload Field phantom entry fix
+      $args = arg();
+      if (count($args) == 2 && isset($form['line_item_fields']['field_upload'][LANGUAGE_NONE][1])) {
+        if (isset($form['line_item_fields']['field_upload'][LANGUAGE_NONE][0]['#default_value']['fid'])
+          && !$form['line_item_fields']['field_upload'][LANGUAGE_NONE][0]['#default_value']['fid']) {
+          unset($form['line_item_fields']['field_upload'][LANGUAGE_NONE][0]);
+        }
+      }
 
       $exists = db_select('commerce_term_pricing_node_options', 'ctpno')
         ->fields('ctpno')
@@ -219,15 +228,16 @@ function worx_commerce_term_pricing_form_alter(&$form, &$form_state, $form_id) {
         ->execute()
         ->fetchAssoc();
 
-      if (!empty($exists)) {
-        $options = unserialize($exists['options_data']);
-        $available_fields = $options['available_fields'];
         // First we turn off access to fields
         foreach ($form['line_item_fields'] as $field => &$settings) {
           if (is_array($settings) && isset($settings['#access'])) {
             $settings['#access'] = FALSE;
           }
         }
+
+      if (!empty($exists)) {
+        $options = unserialize($exists['options_data']);
+        $available_fields = $options['available_fields'];
         // Now add access back for appropriate fields.
         foreach ($available_fields as $available_field) {
           //dsm('Field ' . $available_field . ' required status: ' . $options[$available_field . '_required'] . ' and the label is ' . $options[$available_field . '_label']);
@@ -241,17 +251,31 @@ function worx_commerce_term_pricing_form_alter(&$form, &$form_state, $form_id) {
             $field_settings[LANGUAGE_NONE]['#options'] = array_intersect_key($field_settings[LANGUAGE_NONE]['#options'], array_filter($options[$available_field . '_options']));
           }
         }
-        array_unshift($form['validate'], 'worx_commerce_term_pricing_image_validation');
+        array_unshift($form['#validate'], 'worx_commerce_term_pricing_image_validation');
       }
     }
   }
 }
 
 function worx_Commerce_term_pricing_image_validation($form, &$form_state) {
-  $values = $form_state['value'];
-  if (isset($values['field_number_of_images'])) {
-    //@TODO: Count number of images uploaded and compare to number of images
-    // field setting. If not the same, return error.
-    form_set_error('', 'Test Error');
+  if (isset($form_state['values']['op'])) {
+    $values = $form_state['values'];
+    if (isset($values['line_item_fields']['field_number_of_images']['und'][0]['tid'])) {
+      $amount_term = taxonomy_term_load($values['line_item_fields']['field_number_of_images']['und'][0]['tid']);
+
+      $image_count = 0;
+      foreach ($values['line_item_fields']['field_upload'][LANGUAGE_NONE] as $image_values) {
+        if (isset($image_values['fid'])) {
+          $image_values['fid'] ? $image_count++ : $image_count;
+        }
+      }
+
+      if (is_numeric($amount_term->name) && intval($amount_term->name) != $image_count) {
+        form_set_error("line_item_fields][field_number_of_images", 'The number of images uploaded does not match your selection.');
+      }
+      else if (!is_numeric($amount_term->name) && $image_count) {
+        form_set_error('line_item_fields][field_number_of_images', 'Too many images uploaded.');
+      }
+    }
   }
 }
