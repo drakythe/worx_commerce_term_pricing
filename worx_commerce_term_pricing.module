@@ -7,6 +7,21 @@ function worx_commerce_term_pricing_menu() {
   $items = array();
 
   $items['node/%node/term_pricing'] = array(
+    'title' => 'Create/edit Option Sets',
+    'description' => 'Edit or add Bulk Flavor Display Option for Node',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('worx_commerce_term_pricing_node_option_form', 1),
+    'access callback' => 'worx_commerce_term_pricing_access',
+    'access arguments' => array(1),
+    'file' => 'worx_commerce_term_pricing.admin.inc',
+    'file path' => drupal_get_path('module', 'worx_commerce_term_pricing'),
+    'type' => MENU_LOCAL_TASK,
+  );
+  $items['node/%node/term_pricing/options'] = array(
+    'title' => 'Available Options',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+  $items['node/%node/term_pricing/rule'] = array(
     'title' => 'Term Pricing Settings',
     'description' => 'Review and add new term pricing',
     'page callback' => 'drupal_get_form',
@@ -17,10 +32,6 @@ function worx_commerce_term_pricing_menu() {
     'file path' => drupal_get_path('module', 'worx_commerce_term_pricing'),
     'type' => MENU_LOCAL_TASK,
   );
-  $items['node/%node/term_pricing/rule'] = array(
-    'title' => 'Term Pricing',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-  );
   $items['admin/commerce/term_pricing/options'] = array(
     'title' => 'Display Option Sets',
     'description' => 'Review and add Bulk Flavor Display Options',
@@ -30,17 +41,6 @@ function worx_commerce_term_pricing_menu() {
     'file' => 'worx_commerce_term_pricing.admin.inc',
     'file path' => drupal_get_path('module', 'worx_commerce_term_pricing'),
     'type' => MENU_NORMAL_ITEM,
-  );
-  $items['node/%node/term_pricing/options'] = array(
-    'title' => 'Create/edit Option Sets',
-    'description' => 'Edit or add Bulk Flavor Display Option for Node',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('worx_commerce_term_pricing_node_option_form', 1),
-    'access callback' => 'worx_commerce_term_pricing_access',
-    'access arguments' => array(1),
-    'file' => 'worx_commerce_term_pricing.admin.inc',
-    'file path' => drupal_get_path('module', 'worx_commerce_term_pricing'),
-    'type' => MENU_LOCAL_TASK,
   );
   $items['admin/commerce/term_pricing/rule/%/delete'] = array(
     'title' => 'Delete Term Pricing Rule',
@@ -202,6 +202,9 @@ function worx_commerce_term_pricing_delete_option($nid) {
 
 function worx_commerce_term_pricing_form_alter(&$form, &$form_state, $form_id) {
   if (strpos($form_id, 'commerce_cart_add_to_cart_form') !== FALSE) {
+    if (!isset($form_state['image_num_error'])) {
+      $form_state['image_num_error'] = FALSE;
+    }
     $node = menu_get_object();
     // Don't like this but its because of the ajax call return
     if (is_object($node)) {
@@ -214,11 +217,10 @@ function worx_commerce_term_pricing_form_alter(&$form, &$form_state, $form_id) {
       $nid = $node->nid;
 
       //Upload Field phantom entry fix
-      $args = arg();
-      if (count($args) == 2 && isset($form['line_item_fields']['field_upload'][LANGUAGE_NONE][1])) {
-        if (isset($form['line_item_fields']['field_upload'][LANGUAGE_NONE][0]['#default_value']['fid'])
-          && !$form['line_item_fields']['field_upload'][LANGUAGE_NONE][0]['#default_value']['fid']) {
+      if ($form_state['image_num_error']) {
+        if (!empty($form['line_item_fields']['field_upload'][LANGUAGE_NONE][0]['#default_value']['fid'])) {
           unset($form['line_item_fields']['field_upload'][LANGUAGE_NONE][0]);
+          $form_state['image_num_error'] = FALSE;
         }
       }
 
@@ -257,7 +259,7 @@ function worx_commerce_term_pricing_form_alter(&$form, &$form_state, $form_id) {
   }
 }
 
-function worx_Commerce_term_pricing_image_validation($form, &$form_state) {
+function worx_commerce_term_pricing_image_validation($form, &$form_state) {
   if (isset($form_state['values']['op'])) {
     $values = $form_state['values'];
     if (isset($values['line_item_fields']['field_number_of_images']['und'][0]['tid'])) {
@@ -271,9 +273,11 @@ function worx_Commerce_term_pricing_image_validation($form, &$form_state) {
       }
 
       if (is_numeric($amount_term->name) && intval($amount_term->name) != $image_count) {
+        $form_state['image_num_error'] = TRUE;
         form_set_error("line_item_fields][field_number_of_images", 'The number of images uploaded does not match your selection.');
       }
       else if (!is_numeric($amount_term->name) && $image_count) {
+        $form_state['image_num_error'] = TRUE;
         form_set_error('line_item_fields][field_number_of_images', 'Too many images uploaded.');
       }
     }
