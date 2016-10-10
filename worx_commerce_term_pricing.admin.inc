@@ -259,7 +259,7 @@ function worx_commerce_term_pricing_get_rules($nid) {
         foreach ($vocab_tree as $term) {
           $term_options[$term->tid] = $term->name;
         }
-        $attribute_name = $term_options[$attribute_array[$field_id]];
+        $attribute_name = $term_vocab->name . ': ' .$term_options[$attribute_array[$field_id]];
         break;
     }
 
@@ -268,7 +268,7 @@ function worx_commerce_term_pricing_get_rules($nid) {
       $attribute_name,
       $row->price_change,
       $row->change_type, 
-      l('Delete', 'admin/commerce/term_pricing/rule/' . $row->tprid . '/delete', array('query' => array('destination' => '/node/' .$nid . '/term_pricing')))
+      l('Delete', 'admin/commerce/term_pricing/rule/' . $row->tprid . '/delete', array('query' => array('destination' => '/node/' .$nid . '/term_pricing/rule')))
     );
   }
 
