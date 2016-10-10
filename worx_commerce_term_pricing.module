@@ -246,8 +246,8 @@ function worx_commerce_term_pricing_form_alter(&$form, &$form_state, $form_id) {
           $field_settings = &$form['line_item_fields'][$available_field];
           $field_settings['#access'] = TRUE;
           $field_settings[LANGUAGE_NONE]['#required'] = $options[$available_field . '_required'];
-          $field_settings[LANGUAGE_NONE]['#title'] = $options[$available_field . '_label'];
           $field_settings[LANGUAGE_NONE][0]['#title'] = $options[$available_field . '_label'];
+          $field_settings[LANGUAGE_NONE][0]['value']['#title'] = $options[$available_field . '_label'];
 
           if (isset($field_settings[LANGUAGE_NONE]['#options'])) {
             $field_settings[LANGUAGE_NONE]['#options'] = array_intersect_key($field_settings[LANGUAGE_NONE]['#options'], array_filter($options[$available_field . '_options']));
