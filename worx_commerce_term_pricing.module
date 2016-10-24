@@ -109,6 +109,8 @@ function worx_commerce_term_pricing_rules_action_info() {
 }
 
 /**
+ * Calculates product price baed on applicable rules.
+ *
  * @param $line_item
  *  Commerce Line Item Object
  * @return array
@@ -151,14 +153,15 @@ function worx_commerce_term_pricing_calculate_price($line_item) {
       if (isset($line_item->{$property}[LANGUAGE_NONE])) {
         $keys = array_keys($line_item->{$property}[LANGUAGE_NONE][0]);
         if ($line_item->{$property}[LANGUAGE_NONE][0][$keys[0]] == $value) {
-          // Assuming we found a rule which applies to this product, calculate the new
-          // price and return it.
+          // Assuming we found a rule which applies to this product, calculate
+          // the new price and return it.
           $change = $result['price_change'];
           $type = $result['change_type'];
 
           // If the change is a flat change, simple add the two values together
-          // after converting the change to minor units. Otherwise determine % value
-          // and multiply by the change value, rounding to account for decimal %s.
+          // after converting the change to minor units. Otherwise determine %
+          // value and multiply by the change value, rounding to account for
+          // decimal %s.
           if ($type == 'flat') {
             $change = (int) ($change * 100); // convert to minor units, discard any extra decimal places;
             $calculated_price = $calculated_price + $change;
@@ -176,6 +179,10 @@ function worx_commerce_term_pricing_calculate_price($line_item) {
   );
 }
 
+/**
+ * @param $rule_id
+ *  Int
+ */
 function worx_commerce_term_pricing_delete_rule($rule_id) {
   // @TODO: Setup a "nothing to delete" return for if we get here and don't find
   // a valid record.
@@ -188,6 +195,10 @@ function worx_commerce_term_pricing_delete_rule($rule_id) {
   drupal_goto(drupal_get_destination());
 }
 
+/**
+ * @param $nid
+ *  Int
+ */
 function worx_commerce_term_pricing_delete_option($nid) {
   // @TODO: Setup a "nothing to delete" return for if we get here and don't find
   // a valid record.
@@ -200,6 +211,19 @@ function worx_commerce_term_pricing_delete_option($nid) {
   drupal_goto(drupal_get_destination());
 }
 
+/**
+ * Alters the add to cart form available options.
+ *
+ * Takes the options set in administration for this particular node and makes
+ * them the only available attributes.
+ *
+ * @param $form
+ *  Array
+ * @param $form_state
+ *  Array
+ * @param $form_id
+ *  String
+ */
 function worx_commerce_term_pricing_form_alter(&$form, &$form_state, $form_id) {
   if (strpos($form_id, 'commerce_cart_add_to_cart_form') !== FALSE) {
     if (!isset($form_state['image_num_error'])) {
@@ -259,6 +283,17 @@ function worx_commerce_term_pricing_form_alter(&$form, &$form_state, $form_id) {
   }
 }
 
+/**
+ * Validates that the number of images uploaded is correct.
+ *
+ * @param $form
+ *  Form Render Array
+ * @param $form_state
+ *  Form State Array
+ *
+ * @TODO: Need to break this out into a custom module, either a sub or
+ * completely outside.
+ */
 function worx_commerce_term_pricing_image_validation($form, &$form_state) {
   if (isset($form_state['values']['op'])) {
     $values = $form_state['values'];

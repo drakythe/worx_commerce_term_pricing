@@ -9,6 +9,16 @@
  * For image upload field, a max number of images dropdown.
  */
 
+/**
+ * @param $form
+ *  Array
+ * @param $form_state
+ *  Array
+ * @param $node
+ *  Array
+ * @return mixed
+ *  Array
+ */
 function worx_commerce_term_pricing_settings_form($form, &$form_state, $node) {
   $term_options = $available_products = array();
   // @TODO: This needs to be a var set somewhere.
@@ -145,6 +155,12 @@ function worx_commerce_term_pricing_settings_form($form, &$form_state, $node) {
   return $form;
 }
 
+/**
+ * @param $form
+ *  Array
+ * @param $form_state
+ *  Array
+ */
 function worx_commerce_term_pricing_rule_validate($form, &$form_state) {
   $values = $form_state['values'];
 
@@ -165,6 +181,12 @@ function worx_commerce_term_pricing_rule_validate($form, &$form_state) {
   }
 }
 
+/**
+ * @param $form
+ *  Array
+ * @param $form_state
+ *  Array
+ */
 function worx_commerce_term_pricing_settings_form_submit($form, &$form_state) {
   $values = $form_state['values'];
   $record = array();
@@ -205,6 +227,11 @@ function worx_commerce_term_pricing_settings_form_submit($form, &$form_state) {
   }
 }
 
+/**
+ * @param $nid
+ *  Int
+ * @return string
+ */
 function worx_commerce_term_pricing_get_rules($nid) {
   $header = array(
     array('data' => 'Product', 'field' => 'product_sku', 'sort' => 'ASC'),
@@ -278,6 +305,9 @@ function worx_commerce_term_pricing_get_rules($nid) {
   return $output;
 }
 
+/**
+ * @return array
+ */
 function worx_commerce_term_pricing_options_form() {
   $form = $node_options = $saved_options = array();
   // @TODO: Make 'product_display' a variable that can be configured.
@@ -306,6 +336,11 @@ function worx_commerce_term_pricing_options_form() {
   return $form;
 }
 
+/**
+ * @param $unsaved_options
+ * @param $saved_options
+ * @return string
+ */
 function worx_commerce_term_pricing_options_create_table($unsaved_options, $saved_options) {
   $rows = array();
   $header = array(
@@ -316,6 +351,10 @@ function worx_commerce_term_pricing_options_create_table($unsaved_options, $save
 
   foreach ($saved_options as $nid => $options) {
     $node = node_load($nid);
+    // Make sure the NID returned a valid node.
+    if (!$node) {
+      continue;
+    }
     $title = $node->title;
     $rows[] = array(
       $title,
@@ -337,6 +376,17 @@ function worx_commerce_term_pricing_options_create_table($unsaved_options, $save
   return $output;
 }
 
+/**
+ * Creates the option set form for determining available attributes on a node.
+ *
+ * @param $form
+ *  Array
+ * @param $form_id
+ *  Array
+ * @param $node
+ *  Object
+ * @return array
+ */
 function worx_commerce_term_pricing_node_option_form($form, &$form_id, $node) {
   $form = $possible_fields = $list_fields = $term_fields = $text_fields = $image_fields = array();
 
